@@ -1,0 +1,5 @@
+cd /Users/marclatour/Documents/GitHub/SU2
+make clean
+./bootstrap
+./configure --prefix=/Users/marclatour/Documents/GitHub/SU2  CXXFLAGS="-O3" --enable-mpi --with-cc=/usr/local/bin/mpicc --with-cxx=/usr/local/bin/mpicxx
+make -j 4 install

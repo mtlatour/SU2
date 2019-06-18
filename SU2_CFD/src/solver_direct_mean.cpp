@@ -4924,7 +4924,7 @@ void CEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_contain
       /*--- Load the volume of the dual mesh cell ---*/
       numerics->SetVolume(geometry->node[iPoint]->GetVolume());
 
-      /*--- Compute the rotating frame source residual ---*/
+      /*--- Compute the body force source residual ---*/
       numerics->ComputeResidual(Residual, config);
 
       /*--- Add the source residual to the total ---*/
@@ -5070,7 +5070,7 @@ void CEulerSolver::Source_Template(CGeometry *geometry, CSolver **solver_contain
   /* This method should be used to call any new source terms for a particular problem*/
   /* This method calls the new child class in CNumerics, where the new source term should be implemented.  */
   
-  /* Next we describe how to get access to some important quanties for this method */
+  /* Next we describe how to get access to some important quantities for this method */
   /* Access to all points in the current geometric mesh by saying: nPointDomain */
   /* Get the vector of conservative variables at some point iPoint = node[iPoint]->GetSolution() */
   /* Get the volume (or area in 2D) associated with iPoint = node[iPoint]->GetVolume() */

@@ -5727,10 +5727,36 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 }
 
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
-  
   unsigned short iDim;
   su2double Force_Ref = config->GetForce_Ref();
-  
+
+    /*--- Hard coding of flat plate body force to residuals ---*/
+    float pi = M_PI;
+    const int s = 1; //blade pitch
+    const int alpha = 10; //Angle of flat plate in degrees
+    const float plate_angle = alpha * pi /180; //Angle of flat plate in radians®
+
+    /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate BF magnitude---*/
+    su2double Velocity_i, Velocity_i_x, Velocity_i_y, delta_flow, sq_vel, BF_magnitude;
+    Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
+    Velocity_i_y = U_i[2] / U_i[0];
+    delta_flow = atan (Velocity_i_y/Velocity_i_x); //Radians
+    sq_vel = 0.0;
+    for (iDim = 0; iDim < nDim; iDim++) {
+        Velocity_i = U_i[iDim+1] / U_i[0];
+        sq_vel += Velocity_i *Velocity_i;
+    }
+    BF_magnitude = ((2 * pi)/(s * cos (plate_angle)))*(plate_angle + delta_flow) * sq_vel;
+
+    /*--- Calculate body force components ---*/
+    su2double BF_x, BF_y;
+    BF_x = sin(delta_flow) * BF_magnitude;
+    BF_y = cos(delta_flow) * BF_magnitude;
+
+    /*--- Add body forces to body force vector ---*/
+    Body_Force_Vector[0] += BF_x;
+    Body_Force_Vector[1] += BF_y;
+
   /*--- Zero the continuity contribution ---*/
   
   val_residual[0] = 0.0;
