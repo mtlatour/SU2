@@ -5732,8 +5732,8 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
 
     /*--- Hard coding of flat plate body force to residuals ---*/
     float pi = M_PI;
-    const int s = 1; //blade pitch
-    const int alpha = 10; //Angle of flat plate in degrees
+    const int s = 4; //blade pitch (high so that flow turning is low)
+    const int alpha = 5; //Angle of flat plate in degrees
     const float plate_angle = alpha * pi /180; //Angle of flat plate in radians®
 
     /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate BF magnitude---*/
