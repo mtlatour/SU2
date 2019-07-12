@@ -5734,24 +5734,33 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     float pi = M_PI;
     const int s = 4; //blade pitch (high so that flow turning is low)
     const int alpha = -5; //Angle of flat plate in degrees
-    const float plate_angle = alpha * pi /180; //Angle of flat plate in radians®
+    const float plate_angle = alpha * pi /180; //Angle of flat plate in radians
 
-    /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate BF magnitude---*/
-    su2double Velocity_i, Velocity_i_x, Velocity_i_y, delta_flow, sq_vel, BF_magnitude;
+    /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate deflection angle, and calculate BF magnitude---*/
+    su2double Velocity_i, Velocity_i_x, Velocity_i_y, delta_flow, delta, delta_abs, BF_sign, sq_vel, BF_magnitude;
     Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
     Velocity_i_y = U_i[2] / U_i[0];
     delta_flow = atan (Velocity_i_y/Velocity_i_x); //Flow deviation w.r.t. x-axis (in radians)
-    sq_vel = 0.0;
-    for (iDim = 0; iDim < nDim; iDim++) {
-        Velocity_i = U_i[iDim+1] / U_i[0];
-        sq_vel += Velocity_i *Velocity_i;
-    }
-    BF_magnitude = ((2 * pi)/(s * cos (plate_angle)))*(plate_angle - delta_flow) * sq_vel;
+    delta = delta_flow - plate_angle;
+    delta_abs = abs(delta); //Magnitude needs absolute value of difference between flow and camber angle
+    BF_sign = delta / delta ; //Unit value with sign of deflection (used to deflect flow up or down)
+    sq_vel = Velocity_i_x*Velocity_i_x + Velocity_i_y*Velocity_i_y;
+    BF_magnitude = 2 * pi * delta_abs * sq_vel * (1/s) * (1/cos(plate_angle));
 
-    /*--- Calculate body force components ---*/
+    /*--- Determine direction and components of BF depending on sign of the angle between flow and camber ---*/
     su2double BF_x, BF_y;
-    BF_x = sin(-delta_flow) * BF_magnitude;
-    BF_y = cos(delta_flow) * BF_magnitude;
+    if (BF_sign > 0)
+    {
+        BF_x = sin(delta_flow) * BF_magnitude;
+        BF_y = cos(pi + delta_flow) * BF_magnitude;
+        //Add code for downwards deflection
+    }
+    else
+    {
+        BF_x = sin(pi + delta_flow) * BF_magnitude;
+        BF_y = cos(delta_flow) * BF_magnitude;
+        //Add code for upward deflection
+    }
 
     /*--- Add body forces to body force vector ---*/
     Body_Force_Vector[0] += BF_x;
@@ -5760,7 +5769,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   /*--- Zero the continuity contribution ---*/
   
   val_residual[0] = 0.0;
-  
+
   /*--- Momentum contribution ---*/
   
   for (iDim = 0; iDim < nDim; iDim++)
