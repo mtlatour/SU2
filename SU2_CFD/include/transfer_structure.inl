@@ -1,4 +1,4 @@
-f/*!
+/*!
  * \file transfer_structure.inl
  * \brief In-Line subroutines of the <i>transfer_structure.hpp</i> file.
  * \author R. Sanchez
