@@ -5737,37 +5737,48 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   if (iZone == 1) {
       /*-------- Hard coding of flat plate body force to residuals --------*/
       /*--- Initialize flat plate geometry and angles ---*/
-      su2double pi, pitch, alpha, plate_angle;
+      su2double pi, pitch, alpha, plate_angle, omega, R, omegaR;
       pi = M_PI;
       pitch = 100; //blade pitch (high so that flow turning is low)
-      alpha = -5; //Angle of flat plate in degrees
+      alpha = 0; //Angle of flat plate in degrees
       plate_angle = alpha * pi / 180; //Angle of flat plate in radians
+      omega = 1000; //per second
+      R = 1; //radius
+      omegaR = omega * R; //angular velocity
 
       /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate deflection angle, and calculate BF magnitude---*/
-      su2double Velocity_i, Velocity_i_x, Velocity_i_y, delta_flow, delta, delta_abs, vel_mag, sq_vel, BF_magnitude;
+      su2double Velocity_i_x, Velocity_i_y, delta_flow, delta, delta_abs, vel_mag, sq_vel, BF_magnitude;
       Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
       Velocity_i_y = U_i[2] / U_i[0];
       delta_flow = atan(Velocity_i_y / Velocity_i_x); //Flow deviation w.r.t. x-axis (in radians)
       delta = delta_flow - plate_angle;
       delta_abs = abs(delta); //Magnitude needs absolute value of difference between flow and camber angle
       vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+      sq_vel = vel_mag * vel_mag;
       BF_magnitude = pi * delta_abs * vel_mag * (1 / pitch);
       // BF_magnitude = 2 * pi * delta_abs * sq_vel * (1/pitch) * (1/cos(abs(plate_angle)));
 
       /*--- Determine direction and components of BF depending on sign of the angle between flow and camber ---*/
       su2double BF_x, BF_y;
-      if (delta > 0) {
+      if (delta > 0.0005) {
           BF_x = sin(delta_flow) * BF_magnitude;
           BF_y = cos(pi + delta_flow) * BF_magnitude;
       }
-      if (delta < 0) {
+      else if (delta < 0.0005) {
           BF_x = sin(pi + delta_flow) * BF_magnitude;
           BF_y = cos(delta_flow) * BF_magnitude;
+      }
+      else {
+          BF_x = 0;
+          BF_y = 0;
       }
 
       /*--- Add body forces to body force vector ---*/
       Body_Force_Vector[0] += BF_x;
       Body_Force_Vector[1] += BF_y;
+
+      //Body_Force_Vector[0] = -5.0;
+      //Body_Force_Vector[1] = -50.0;
 
       /*--- Zero the continuity contribution ---*/
 
