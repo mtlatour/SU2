@@ -5765,6 +5765,8 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     /*--- Add body forces to body force vector ---*/
     Body_Force_Vector[0] += BF_x;
     Body_Force_Vector[1] += BF_y;
+    //Body_Force_Vector[0] = 0.0;
+    //Body_Force_Vector[1] = 0.0;
 
   /*--- Zero the continuity contribution ---*/
   
