@@ -5739,7 +5739,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       /*--- Initialize flat plate geometry and angles ---*/
       su2double pi, pitch, alpha, plate_angle, omega, R, omegaR;
       pi = M_PI;
-      pitch = 2; //blade pitch (high so that flow turning is low)
+      pitch = 3; //blade pitch (high so that flow turning is low)
       alpha = 5; //Angle of flat plate in degrees (ONLY FOR CASE WHERE FLAT PLATE ANGLES IN THE NEGATIVE Y-DIRECTION)
       plate_angle = alpha * pi / 180; //Angle of flat plate in radians
 
@@ -5807,7 +5807,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       for (iDim = 0; iDim < nDim; iDim++)
           val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
   }
-  
+
 }
 
 CSourceRotatingFrame_Flow::CSourceRotatingFrame_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
