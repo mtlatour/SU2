@@ -5737,26 +5737,36 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   if (iZone == 1) {
       /*-------- Hard coding of flat plate body force to residuals --------*/
       /*--- Initialize flat plate geometry and angles ---*/
-      su2double pi, pitch, alpha, plate_angle, omega, R, omegaR;
+      su2double pi, pitch, alpha, plate_angle, Nx, Ny, omega, R, omegaR;
       pi = M_PI;
-      pitch = 3; //blade pitch (high so that flow turning is low)
-      alpha = 5; //Angle of flat plate in degrees (ONLY FOR CASE WHERE FLAT PLATE ANGLES IN THE NEGATIVE Y-DIRECTION)
+      pitch = 1; //blade pitch (high so that flow turning is low)
+      alpha = 5; //Angle of flat plate in degrees
       plate_angle = alpha * pi / 180; //Angle of flat plate in radians
+      Nx = sin(plate_angle); //x-component of normal vector of plate
+      Ny = cos(plate_angle); //y-component of normal vector of plate
+      omega = 0;
+      R = 1;
+      omegaR = omega * R;
 
       /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate deflection angle, and calculate BF magnitude---*/
-      su2double Velocity_i_x, Velocity_i_y, delta_flow, delta, delta_abs, vel_mag, sq_vel, BF_magnitude;
+      su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_x, BF_y;
       Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
-      Velocity_i_y = U_i[2] / U_i[0];
-      delta_flow = atan(Velocity_i_y / Velocity_i_x); //Flow deviation w.r.t. x-axis (in radians)
-      delta = delta_flow + plate_angle;
-      delta_abs = abs(delta); //Magnitude needs absolute value of difference between flow and camber angle
+      Velocity_i_y = U_i[2] / U_i[0] - omegaR;
       vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+      WdotN = Velocity_i_x*Nx + Velocity_i_y*Ny;
+      delta = asin(WdotN/vel_mag);
       sq_vel = vel_mag * vel_mag;
-      //BF_magnitude = pi * delta_abs * vel_mag * (1 / pitch);
-      BF_magnitude = 2 * pi * delta_abs * sq_vel * (1/pitch) * (1/cos(abs(plate_angle)));
+      BF_magnitude = pi * delta * sq_vel * (1/pitch);
+      BF_n = BF_magnitude * cos(delta);
+      BF_x = -BF_magnitude * Nx;
+      BF_y = -BF_magnitude * Ny;
 
-      /*--- Determine direction and components of BF depending on sign of the angle between flow and camber ---*/
-      su2double BF_x, BF_y;
+      /*--- OLD DELTA CALCULATION
+      delta = delta_flow + plate_angle;
+      delta_abs = abs(delta); //Magnitude needs absolute value of difference between flow and camber angle ---*/
+
+      /*--- Determine direction and components of BF depending on sign of the angle between flow and camber
+
       if (delta > 0) {
           BF_x = sin(delta_flow) * BF_magnitude;
           BF_y = cos(pi + delta_flow) * BF_magnitude;
@@ -5764,7 +5774,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       else if (delta < 0) {
           BF_x = sin(pi + delta_flow) * BF_magnitude;
           BF_y = cos(delta_flow) * BF_magnitude;
-      }
+      } ---*/
 
       //cout << "BFx: " << BF_x << endl;
       //cout << "BFy: " << BF_y << endl;
