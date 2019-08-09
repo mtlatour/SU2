@@ -5737,55 +5737,42 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   if (iZone == 1) {
       /*-------- Hard coding of flat plate body force to residuals --------*/
       /*--- Initialize flat plate geometry and angles ---*/
-      su2double pi, pitch, alpha, plate_angle, Nx, Ny, omega, R, omegaR;
+      su2double pi, pitch, alpha, plate_angle, Nx, Ny, Tx, Ty, omega, R, omegaR;
       pi = M_PI;
-      pitch = 1; //blade pitch (high so that flow turning is low)
+      pitch = 1; //blade pitch
       alpha = 5; //Angle of flat plate in degrees
       plate_angle = alpha * pi / 180; //Angle of flat plate in radians
       Nx = sin(plate_angle); //x-component of normal vector of plate
       Ny = cos(plate_angle); //y-component of normal vector of plate
+      Tx = cos(plate_angle);
+      Ty = sin(pi + plate_angle);
       omega = 0;
       R = 1;
       omegaR = omega * R;
 
       /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate deflection angle, and calculate BF magnitude---*/
-      su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_x, BF_y;
+      su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
       Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
       Velocity_i_y = U_i[2] / U_i[0] - omegaR;
       vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
       WdotN = Velocity_i_x*Nx + Velocity_i_y*Ny;
       delta = asin(WdotN/vel_mag);
       sq_vel = vel_mag * vel_mag;
-      BF_magnitude = pi * delta * sq_vel * (1/pitch);
-      BF_n = BF_magnitude * cos(delta);
-      BF_x = -BF_magnitude * Nx;
-      BF_y = -BF_magnitude * Ny;
-
-      /*--- OLD DELTA CALCULATION
-      delta = delta_flow + plate_angle;
-      delta_abs = abs(delta); //Magnitude needs absolute value of difference between flow and camber angle ---*/
-
-      /*--- Determine direction and components of BF depending on sign of the angle between flow and camber
-
-      if (delta > 0) {
-          BF_x = sin(delta_flow) * BF_magnitude;
-          BF_y = cos(pi + delta_flow) * BF_magnitude;
-      }
-      else if (delta < 0) {
-          BF_x = sin(pi + delta_flow) * BF_magnitude;
-          BF_y = cos(delta_flow) * BF_magnitude;
-      } ---*/
-
-      //cout << "BFx: " << BF_x << endl;
-      //cout << "BFy: " << BF_y << endl;
+      BF_magnitude = pi * delta * (1/pitch) * sq_vel * (1/Ny);
+      BF_n = BF_magnitude * cos(delta); //Split normal into x and y-components
+      BF_nx = BF_n * Nx;
+      BF_ny = BF_n * Ny;
+      BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
+      BF_tx = BF_t * Tx;
+      BF_ty = BF_t * Ty;
+      BF_x = BF_nx + BF_tx;
+      BF_y = BF_ny + BF_ty;
 
       /*--- Add body forces to body force vector ---*/
       Body_Force_Vector[0] = BF_x;
       Body_Force_Vector[1] = BF_y;
 
-      //Body_Force_Vector[0] = -5.0;
-      //Body_Force_Vector[1] = -50.0;
-
+      /*--- Adding source terms to the governing equations ---*/
       /*--- Zero the continuity contribution ---*/
 
       val_residual[0] = 0.0;
