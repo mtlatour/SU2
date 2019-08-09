@@ -5750,7 +5750,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       R = 1;
       omegaR = omega * R;
 
-      /*--- Initialize velocity variables, determine flow angle w.r.t. x-axis, calculate deflection angle, and calculate BF magnitude---*/
+      /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
       su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
       Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
       Velocity_i_y = U_i[2] / U_i[0] - omegaR;
@@ -5759,7 +5759,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       delta = asin(WdotN/vel_mag);
       sq_vel = vel_mag * vel_mag;
       BF_magnitude = pi * delta * (1/pitch) * sq_vel * (1/Ny);
-      BF_n = BF_magnitude * cos(delta); //Split normal into x and y-components
+      BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
       BF_nx = BF_n * Nx;
       BF_ny = BF_n * Ny;
       BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
