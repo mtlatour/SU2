@@ -5726,9 +5726,11 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 
 }
 
-void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
+void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry) {
   unsigned short iDim;
+  unsigned long iPoint;
   su2double Force_Ref = config->GetForce_Ref();
+  su2double *Coord_i = geometry->node[iPoint]->GetCoord();
 
   /*--- Get number of zones so that multi-zone hard-coding can be tried ---*/
   unsigned short iZone = config->GetiZone();
@@ -5752,6 +5754,8 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
           omega = 0;
           R = 1;
           omegaR = omega * R;
+          cout << "Coord_i_x: " << Coord_i[0] << endl;
+          cout << "Coord_i_y: " << Coord_i[1] << endl;
 
           /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
           su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
@@ -5807,11 +5811,21 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
               val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
       }
   }
-  else {
+  else if (impl == "camb") {
       if (iZone == 1) {
           /*-------- Hard coding of cambered airfoil body force to residuals --------*/
+          /*--- Initialize basic variables ---*/
+          su2double pi, pitch, omega, R, omegaR;
+          pi = M_PI;
+          pitch = 1; //blade pitch
+          omega = 0;
+          R = 1;
+          omegaR = omega * R;
 
           /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
+          su2double Velocity_i_x, Velocity_i_y, BF_x, BF_y;
+          Velocity_i_x = U_i[1]/U_i[0];
+          Velocity_i_y = U_i[2]/U_i[0];
 
           /*--- Add body forces to body force vector ---*/
           Body_Force_Vector[0] = BF_x;
@@ -5848,6 +5862,22 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
           for (iDim = 0; iDim < nDim; iDim++)
               val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
       }
+  }
+  else {
+      /*--- Zero the continuity contribution ---*/
+
+      val_residual[0] = 0.0;
+
+      /*--- Momentum contribution ---*/
+
+      for (iDim = 0; iDim < nDim; iDim++)
+          val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+
+      /*--- Energy contribution ---*/
+
+      val_residual[nDim + 1] = 0.0;
+      for (iDim = 0; iDim < nDim; iDim++)
+          val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
   }
 }
 

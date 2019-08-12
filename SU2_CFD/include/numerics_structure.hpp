@@ -1062,7 +1062,15 @@ public:
    * \param[in] config - Definition of the particular problem.
    */
   virtual void ComputeResidual(su2double *val_residual, CConfig *config);
-  
+
+  /*!
+   * \overload
+   * \param[out] val_residual - Point to the total residual.
+   * \param[in] config - Definition of the particular problem.
+   * \param[in] geometry - Geometry of the particular problem.
+   */
+  virtual void ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry);
+
   /*!
    * \overload
    * \param[out] val_residual_i - Pointer to the total residual at point i.
@@ -5194,7 +5202,7 @@ public:
    * \param[out] val_residual - Pointer to the residual vector.
    * \param[in] config - Definition of the particular problem.
    */
-  void ComputeResidual(su2double *val_residual, CConfig *config);
+  void ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry);
 
 };
 
