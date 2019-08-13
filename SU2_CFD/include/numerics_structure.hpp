@@ -1065,14 +1065,6 @@ public:
 
   /*!
    * \overload
-   * \param[out] val_residual - Point to the total residual.
-   * \param[in] config - Definition of the particular problem.
-   * \param[in] geometry - Geometry of the particular problem.
-   */
-  virtual void ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry);
-
-  /*!
-   * \overload
    * \param[out] val_residual_i - Pointer to the total residual at point i.
    * \param[out] val_residual_j - Pointer to the total residual at point j.
    */
@@ -5201,8 +5193,9 @@ public:
    * \brief Source term integration for a body force.
    * \param[out] val_residual - Pointer to the residual vector.
    * \param[in] config - Definition of the particular problem.
+   * \param[in] Coord_i - Coordinates of iPoint.
    */
-  void ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry);
+  void ComputeResidual(su2double *val_residual, CConfig *config);
 
 };
 

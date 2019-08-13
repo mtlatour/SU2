@@ -160,8 +160,6 @@ inline void CFEAElasticity::Compute_Lame_Parameters(void) {
 
 inline void CNumerics::ComputeResidual(su2double *val_residual, CConfig *config) { }
 
-inline void CNumerics::ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry) {}
-
 inline void CNumerics::ComputeResidual(su2double *val_residual_i, su2double *val_residual_j) { }
 
 inline void CNumerics::ComputeResidual(su2double *val_residual_i, su2double *val_residual_j, CConfig *config) { }

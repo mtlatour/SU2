@@ -5726,11 +5726,9 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 
 }
 
-void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config, CGeometry *geometry) {
+void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
   unsigned short iDim;
-  unsigned long iPoint;
-  su2double Force_Ref = config->GetForce_Ref();
-  su2double *Coord_i = geometry->node[iPoint]->GetCoord();
+  su2double Force_Ref = config->GetForce_Ref();;
 
   /*--- Get number of zones so that multi-zone hard-coding can be tried ---*/
   unsigned short iZone = config->GetiZone();
@@ -5754,8 +5752,6 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config,
           omega = 0;
           R = 1;
           omegaR = omega * R;
-          cout << "Coord_i_x: " << Coord_i[0] << endl;
-          cout << "Coord_i_y: " << Coord_i[1] << endl;
 
           /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
           su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
@@ -5818,14 +5814,36 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config,
           su2double pi, pitch, omega, R, omegaR;
           pi = M_PI;
           pitch = 1; //blade pitch
-          omega = 0;
-          R = 1;
+          omega = 0; //rotational speed
+          R = 1; //radius
           omegaR = omega * R;
 
+          /*--- Determine camber normal depending on x-coordinate ---*/
+          su2double x_coord, theta, Nx, Ny, Tx, Ty;
+          x_coord = Coord_i[0];
+          theta = x_coord * 15; //linear variation of plate angle from 0 at LE to 15 at TE
+          Nx = sin(theta);
+          Ny = cos(theta);
+          Tx = cos(theta);
+          Ty = sin(pi + theta);
+
           /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-          su2double Velocity_i_x, Velocity_i_y, BF_x, BF_y;
-          Velocity_i_x = U_i[1]/U_i[0];
-          Velocity_i_y = U_i[2]/U_i[0];
+          su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+          Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
+          Velocity_i_y = U_i[2] / U_i[0] - omegaR;
+          vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+          WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
+          delta = asin(WdotN / vel_mag);
+          sq_vel = vel_mag * vel_mag;
+          BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+          BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
+          BF_nx = BF_n * Nx;
+          BF_ny = BF_n * Ny;
+          BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
+          BF_tx = BF_t * Tx;
+          BF_ty = BF_t * Ty;
+          BF_x = BF_nx + BF_tx;
+          BF_y = BF_ny + BF_ty;
 
           /*--- Add body forces to body force vector ---*/
           Body_Force_Vector[0] = BF_x;

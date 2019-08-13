@@ -4924,8 +4924,11 @@ void CEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_contain
       /*--- Load the volume of the dual mesh cell ---*/
       numerics->SetVolume(geometry->node[iPoint]->GetVolume());
 
+      /*--- Set coordinates ---*/
+      numerics->SetCoord(geometry->node[iPoint]->GetCoord(), geometry->node[iPoint]->GetCoord());
+
       /*--- Compute the body force source residual ---*/
-      numerics->ComputeResidual(Residual, config, geometry);
+      numerics->ComputeResidual(Residual, config);
 
       /*--- Add the source residual to the total ---*/
       LinSysRes.AddBlock(iPoint, Residual);
