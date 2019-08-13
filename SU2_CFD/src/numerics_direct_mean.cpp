@@ -5735,7 +5735,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   unsigned short nZone = config->GetnZone();
 
   /*--- Use this to select flat plate or cambered implementation ---*/
-  string impl = "flat";
+  string impl = "camb";
   if (impl == "flat") {
       if (iZone == 1) {
           /*-------- Hard coding of flat plate body force to residuals --------*/
@@ -5821,7 +5821,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
           /*--- Determine camber normal depending on x-coordinate ---*/
           su2double x_coord, theta, Nx, Ny, Tx, Ty;
           x_coord = Coord_i[0];
-          theta = x_coord * 15; //linear variation of plate angle from 0 at LE to 15 at TE
+          theta = x_coord * 15 * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
           Nx = sin(theta);
           Ny = cos(theta);
           Tx = cos(theta);
