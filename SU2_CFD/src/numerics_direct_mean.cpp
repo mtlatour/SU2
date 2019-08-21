@@ -5749,7 +5749,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
       Ny = cos(plate_angle); //y-component of normal vector of plate
       Tx = cos(plate_angle);
       Ty = sin(pi + plate_angle);
-      omega = 0;
+      omega = -100;
       R = 1;
       omegaR = omega * R;
 
@@ -5793,7 +5793,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
   }
   else {
       /*--- Use this to select flat plate or cambered implementation ---*/
-      string impl = "flat";
+      string impl = "camb";
       if (impl == "flat") {
           if (iZone == BF_zone) {
               /*-------- Hard coding of flat plate body force to residuals --------*/
@@ -5807,7 +5807,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
               Ny = cos(plate_angle); //y-component of normal vector of plate
               Tx = cos(plate_angle);
               Ty = sin(pi + plate_angle);
-              omega = 1000;
+              omega = -300;
               R = 1;
               omegaR = omega * R;
 
@@ -5871,14 +5871,14 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
               su2double pi, pitch, omega, R, omegaR;
               pi = M_PI;
               pitch = 1; //blade pitch
-              omega = 0; //rotational speed
+              omega = -300; //rotational speed
               R = 1; //radius
               omegaR = omega * R;
 
               /*--- Determine camber normal depending on x-coordinate ---*/
               su2double x_coord, theta, Nx, Ny, Tx, Ty;
               x_coord = Coord_i[0];
-              theta = x_coord * 15 * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
+              theta = (-30 + x_coord * 5) * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
               Nx = sin(theta);
               Ny = cos(theta);
               Tx = cos(theta);
