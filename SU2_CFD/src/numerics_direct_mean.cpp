@@ -5730,175 +5730,178 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     unsigned short iDim;
     su2double Force_Ref = config->GetForce_Ref();;
 
-    /*--- Get number of zones so that multi-zone hard-coding can be tried ---*/
+    /*--- Get number of zones and choose which one to activate BF in ---*/
     unsigned short iZone = config->GetiZone();
     unsigned short nZone = config->GetnZone();
-
-    /*--- Choose between multi-zone and single-zone calculation ---*/
     su2double BF_zone;
     BF_zone = 1;
 
+    /*--- Lookup table interpolation test ---*/
+    su2double Narray[4][2] = {0, 1, 0.1, 0.9, 0.15, 0.85, 0.2, 0.8};
+
     /*--- Use this to select flat plate or cambered implementation ---*/
-    string impl = "camb";
-    if (impl == "flat") {
-        if (iZone == BF_zone) {
-            /*-------- Hard coding of flat plate body force to residuals --------*/
-            /*--- Initialize flat plate geometry and angles ---*/
-            su2double pi, pitch, alpha, plate_angle, Nx, Ny, Tx, Ty, omega, R, omegaR;
-            pi = M_PI;
-            pitch = 1; //blade pitch
-            alpha = -15; //Angle of flat plate in degrees
-            plate_angle = alpha * pi / 180; //Angle of flat plate in radians
-            Nx = sin(plate_angle); //x-component of normal vector of plate
-            Ny = cos(plate_angle); //y-component of normal vector of plate
-            Tx = cos(plate_angle);
-            Ty = sin(pi + plate_angle);
-            omega = -300;
-            R = 1;
-            omegaR = omega * R;
-
-            /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-            su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
-            Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
-            Velocity_i_y = U_i[2] / U_i[0] - omegaR;
-            vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
-            WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
-            delta = asin(WdotN / vel_mag);
-            sq_vel = vel_mag * vel_mag;
-            BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
-            BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
-            BF_nx = BF_n * Nx;
-            BF_ny = BF_n * Ny;
-            BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
-            BF_tx = BF_t * Tx;
-            BF_ty = BF_t * Ty;
-            BF_x = BF_nx + BF_tx;
-            BF_y = BF_ny + BF_ty;
-
-            /*--- Add body forces to body force vector ---*/
-            Body_Force_Vector[0] = BF_x;
-            Body_Force_Vector[1] = BF_y;
-
-            /*--- Adding source terms to the governing equations ---*/
-            /*--- Zero the continuity contribution ---*/
-
-            val_residual[0] = 0.0;
-
-            /*--- Momentum contribution ---*/
-
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-            /*--- Energy contribution ---*/
-
-            val_residual[nDim + 1] = 0.0;
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-        } else {
-            /*--- Zero the continuity contribution ---*/
-
-            val_residual[0] = 0.0;
-
-            /*--- Momentum contribution ---*/
-
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-            /*--- Energy contribution ---*/
-
-            val_residual[nDim + 1] = 0.0;
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-        }
-    } else if (impl == "camb") {
-        if (iZone == BF_zone) {
-            /*-------- Hard coding of cambered airfoil body force to residuals --------*/
-            /*--- Initialize basic variables ---*/
-            su2double pi, pitch, omega, R, omegaR;
-            pi = M_PI;
-            pitch = 1; //blade pitch
-            omega = -300; //rotational speed
-            R = 1; //radius
-            omegaR = omega * R;
-
-            /*--- Determine camber normal depending on x-coordinate ---*/
-            su2double x_coord, theta, Nx, Ny, Tx, Ty;
-            x_coord = Coord_i[0];
-            theta = (-30 + x_coord * 5) * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
-            Nx = sin(theta);
-            Ny = cos(theta);
-            Tx = cos(theta);
-            Ty = sin(pi + theta);
-
-            /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-            su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
-            Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
-            Velocity_i_y = U_i[2] / U_i[0] - omegaR;
-            vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
-            WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
-            delta = asin(WdotN / vel_mag);
-            sq_vel = vel_mag * vel_mag;
-            BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
-            BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
-            BF_nx = BF_n * Nx;
-            BF_ny = BF_n * Ny;
-            BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
-            BF_tx = BF_t * Tx;
-            BF_ty = BF_t * Ty;
-            BF_x = BF_nx + BF_tx;
-            BF_y = BF_ny + BF_ty;
-
-            /*--- Add body forces to body force vector ---*/
-            Body_Force_Vector[0] = BF_x;
-            Body_Force_Vector[1] = BF_y;
-
-            /*--- Adding source terms to the governing equations ---*/
-            /*--- Zero the continuity contribution ---*/
-
-            val_residual[0] = 0.0;
-
-            /*--- Momentum contribution ---*/
-
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-            /*--- Energy contribution ---*/
-
-            val_residual[nDim + 1] = 0.0;
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-        } else {
-            /*--- Zero the continuity contribution ---*/
-
-            val_residual[0] = 0.0;
-
-            /*--- Momentum contribution ---*/
-
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-            /*--- Energy contribution ---*/
-
-            val_residual[nDim + 1] = 0.0;
-            for (iDim = 0; iDim < nDim; iDim++)
-                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-        }
-    } else {
-        /*--- Zero the continuity contribution ---*/
-
-        val_residual[0] = 0.0;
-
-        /*--- Momentum contribution ---*/
-
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-        /*--- Energy contribution ---*/
-
-        val_residual[nDim + 1] = 0.0;
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-    }
+//    string impl = "camb";
+//    if (impl == "flat") {
+//        if (iZone == BF_zone) {
+//            /*-------- Hard coding of flat plate body force to residuals --------*/
+//            /*--- Initialize flat plate geometry and angles ---*/
+//            su2double pi, pitch, alpha, plate_angle, Nx, Ny, Tx, Ty, omega, R, omegaR;
+//            pi = M_PI;
+//            pitch = 1; //blade pitch
+//            alpha = -15; //Angle of flat plate in degrees
+//            plate_angle = alpha * pi / 180; //Angle of flat plate in radians
+//            Nx = sin(plate_angle); //x-component of normal vector of plate
+//            Ny = cos(plate_angle); //y-component of normal vector of plate
+//            Tx = cos(plate_angle);
+//            Ty = sin(pi + plate_angle);
+//            omega = -300;
+//            R = 1;
+//            omegaR = omega * R;
+//
+//            /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
+//            su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+//            Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
+//            Velocity_i_y = U_i[2] / U_i[0] - omegaR;
+//            vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+//            WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
+//            delta = asin(WdotN / vel_mag);
+//            sq_vel = vel_mag * vel_mag;
+//            BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+//            BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
+//            BF_nx = BF_n * Nx;
+//            BF_ny = BF_n * Ny;
+//            BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
+//            BF_tx = BF_t * Tx;
+//            BF_ty = BF_t * Ty;
+//            BF_x = BF_nx + BF_tx;
+//            BF_y = BF_ny + BF_ty;
+//
+//            /*--- Add body forces to body force vector ---*/
+//            Body_Force_Vector[0] = BF_x;
+//            Body_Force_Vector[1] = BF_y;
+//
+//            /*--- Adding source terms to the governing equations ---*/
+//            /*--- Zero the continuity contribution ---*/
+//
+//            val_residual[0] = 0.0;
+//
+//            /*--- Momentum contribution ---*/
+//
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//            /*--- Energy contribution ---*/
+//
+//            val_residual[nDim + 1] = 0.0;
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//        } else {
+//            /*--- Zero the continuity contribution ---*/
+//
+//            val_residual[0] = 0.0;
+//
+//            /*--- Momentum contribution ---*/
+//
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//            /*--- Energy contribution ---*/
+//
+//            val_residual[nDim + 1] = 0.0;
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//        }
+//    }
+//    else if (impl == "camb") {
+//        if (iZone == BF_zone) {
+//            /*-------- Hard coding of cambered airfoil body force to residuals --------*/
+//            /*--- Initialize basic variables ---*/
+//            su2double pi, pitch, omega, R, omegaR;
+//            pi = M_PI;
+//            pitch = 1; //blade pitch
+//            omega = -300; //rotational speed
+//            R = 1; //radius
+//            omegaR = omega * R;
+//
+//            /*--- Determine camber normal depending on x-coordinate ---*/
+//            su2double x_coord, theta, Nx, Ny, Tx, Ty;
+//            x_coord = Coord_i[0];
+//            theta = (-30 + x_coord * 5) * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
+//            Nx = sin(theta);
+//            Ny = cos(theta);
+//            Tx = cos(theta);
+//            Ty = sin(pi + theta);
+//
+//            /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
+//            su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+//            Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
+//            Velocity_i_y = U_i[2] / U_i[0] - omegaR;
+//            vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+//            WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
+//            delta = asin(WdotN / vel_mag);
+//            sq_vel = vel_mag * vel_mag;
+//            BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+//            BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
+//            BF_nx = BF_n * Nx;
+//            BF_ny = BF_n * Ny;
+//            BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
+//            BF_tx = BF_t * Tx;
+//            BF_ty = BF_t * Ty;
+//            BF_x = BF_nx + BF_tx;
+//            BF_y = BF_ny + BF_ty;
+//
+//            /*--- Add body forces to body force vector ---*/
+//            Body_Force_Vector[0] = BF_x;
+//            Body_Force_Vector[1] = BF_y;
+//
+//            /*--- Adding source terms to the governing equations ---*/
+//            /*--- Zero the continuity contribution ---*/
+//
+//            val_residual[0] = 0.0;
+//
+//            /*--- Momentum contribution ---*/
+//
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//            /*--- Energy contribution ---*/
+//
+//            val_residual[nDim + 1] = 0.0;
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//        } else {
+//            /*--- Zero the continuity contribution ---*/
+//
+//            val_residual[0] = 0.0;
+//
+//            /*--- Momentum contribution ---*/
+//
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//            /*--- Energy contribution ---*/
+//
+//            val_residual[nDim + 1] = 0.0;
+//            for (iDim = 0; iDim < nDim; iDim++)
+//                val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//        }
+//    }
+//    else {
+//        /*--- Zero the continuity contribution ---*/
+//
+//        val_residual[0] = 0.0;
+//
+//        /*--- Momentum contribution ---*/
+//
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//        /*--- Energy contribution ---*/
+//
+//        val_residual[nDim + 1] = 0.0;
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//    }
 }
 
 }
