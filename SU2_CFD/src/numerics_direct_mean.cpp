@@ -5729,7 +5729,6 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
     unsigned short iDim;
     su2double Force_Ref = config->GetForce_Ref();;
-    Prim = node[iPoint]->GetPrimitive(); // Temperature is first primitive variable Prim[0]
     su2double gamma, R_gas;
     gamma = config->GetGamma();
     R_gas = config->GetGas_Constant();
@@ -5799,11 +5798,11 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
         Ty = -Nx;
 
         /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-        su2double Velocity_i_x, Velocity_i_y, vel_mag, sound, M_rel, WdotN, delta, sq_vel, BF_magnitude_inc, K, Kprime, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+        su2double Velocity_i_x, Velocity_i_y, vel_mag, sound, M_rel, WdotN, delta, sq_vel, BF_magnitude_inc, K, Kprime, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
         Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
         Velocity_i_y = U_i[2] / U_i[0] - omegaR;
         vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
-        sound = sqrt(gamma * R_gas * Prim[0]);
+        sound = sqrt(gamma * R_gas * V_i[0]); // V_i is primitive variables as point i, T is first value
         M_rel = vel_mag / sound;
         WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
         delta = asin(WdotN / vel_mag);
