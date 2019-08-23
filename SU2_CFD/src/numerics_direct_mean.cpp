@@ -5728,7 +5728,7 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
     unsigned short iDim;
-    su2double Force_Ref = config->GetForce_Ref();;
+    su2double Force_Ref = config->GetForce_Ref();
     su2double gamma, R_gas;
     gamma = config->GetGamma();
     R_gas = config->GetGas_Constant();
