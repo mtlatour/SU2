@@ -5743,7 +5743,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
         su2double pi, pitch, omega, R, omegaR;
         pi = M_PI;
         pitch = 1; //blade pitch
-        omega = -300; //rotational speed
+        omega = -100; //rotational speed
         R = 1; //radius
         omegaR = omega * R;
 
@@ -5751,35 +5751,35 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
         su2double x_coord;
         x_coord = Coord_i[0];
         su2double xarray[5] = {0,0.25,0.5,0.75,1};
-        su2double Nxarray[5] = {-0.342,-0.259,-0.174,-0.087,0};
-        su2double Nyarray[5] = {0.9397,0.966,0.985,0.996,1};
+        su2double Nxarray[5] = {-0.5,-0.474,-0.462,-0.449,-0.423};
+        su2double Nyarray[5] = {0.866,0.88,0.887,0.893,0.906};
         // Calculate difference between coordinate and xarray
         int len = sizeof(xarray)/sizeof(xarray[0]), i;
-        su2double delta[len] = {0};
+        su2double diff[len] = {0};
         for ( i = 0; i < len; i++ ) {
-            delta[i] = xarray[i] - x_coord;
+            diff[i] = xarray[i] - x_coord;
         }
         // Find closest number smaller than coordinate
-        su2double smallest = delta[0];
+        su2double smallest = diff[0];
         for ( i = 0; i < len; i++ ) {
-            if ( delta[i] < 0 && delta[i] > smallest ){
-                smallest = delta[i];
+            if ( diff[i] < 0 && diff[i] > smallest ){
+                smallest = diff[i];
             }
         }
         // Find closest number larger than coordinate
-        su2double largest = delta[len-1];
+        su2double largest = diff[len-1];
         for ( i = 0; i < len; i++ ) {
-            if ( delta[i] > 0 && delta[i] < largest ){
-                largest = delta[i];
+            if ( diff[i] > 0 && diff[i] < largest ){
+                largest = diff[i];
             }
         }
         // Find index of smallest and largest closest numbers
         int smallest_index = 0, largest_index = 0;
         for ( i = 0; i < len; i++ ) {
-            if ( delta[i] == smallest ) {
+            if ( diff[i] == smallest ) {
                 smallest_index = i;
             }
-            if ( delta[i] == largest ) {
+            if ( diff[i] == largest ) {
                 largest_index = i;
             }
         }
@@ -6015,7 +6015,6 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
 //    }
 }
 
-}
 
 CSourceRotatingFrame_Flow::CSourceRotatingFrame_Flow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config) : CNumerics(val_nDim, val_nVar, config) {
   
