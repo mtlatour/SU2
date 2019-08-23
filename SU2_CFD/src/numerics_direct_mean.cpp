@@ -5729,6 +5729,10 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
     unsigned short iDim;
     su2double Force_Ref = config->GetForce_Ref();;
+    Prim = node[iPoint]->GetPrimitive(); // Temperature is first primitive variable Prim[0]
+    su2double gamma, R_gas;
+    gamma = config->GetGamma();
+    R_gas = config->GetGas_Constant();
 
     /*--- Get number of zones and choose which one to activate BF in ---*/
     unsigned short iZone = config->GetiZone();
@@ -5794,16 +5798,40 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
         Tx = Ny;
         Ty = -Nx;
 
-
         /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-        su2double Velocity_i_x, Velocity_i_y, WdotN, delta, vel_mag, sq_vel, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+        su2double Velocity_i_x, Velocity_i_y, vel_mag, sound, M_rel, WdotN, delta, sq_vel, BF_magnitude_inc, K, Kprime, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
         Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
         Velocity_i_y = U_i[2] / U_i[0] - omegaR;
         vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+        sound = sqrt(gamma * R_gas * Prim[0]);
+        M_rel = vel_mag / sound;
         WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
         delta = asin(WdotN / vel_mag);
         sq_vel = vel_mag * vel_mag;
-        BF_magnitude = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+        BF_magnitude_inc = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+
+        // Compressibility correction
+        if (M_rel < 1) {
+            Kprime = 1 / (sqrt(1-(M_rel * M_rel)));
+            if (Kprime <= 3) {
+                K = Kprime;
+            }
+            if (Kprime > 3) {
+                K = 3;
+            }
+        }
+        if (M_rel > 1) {
+            Kprime = 2 / (pi * sqrt((M_rel * M_rel)-1));
+            if (Kprime <= 3) {
+                K = Kprime;
+            }
+            if (Kprime > 3) {
+                K = 3;
+            }
+        }
+        BF_magnitude = K * BF_magnitude_inc;
+
+        // Decompose forces into respective
         BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
         BF_nx = BF_n * Nx;
         BF_ny = BF_n * Ny;

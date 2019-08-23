@@ -4927,6 +4927,9 @@ void CEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_contain
       /*--- Set coordinates ---*/
       numerics->SetCoord(geometry->node[iPoint]->GetCoord(), geometry->node[iPoint]->GetCoord());
 
+      /*--- Load the primitive variables ---*/
+      numerics->SetPrimitive(node[iPoint]->GetPrimitive(), node[iPoint]->GetPrimitive());
+
       /*--- Compute the body force source residual ---*/
       numerics->ComputeResidual(Residual, config);
 
