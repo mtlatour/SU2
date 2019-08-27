@@ -1050,6 +1050,7 @@ private:
   su2double *ExtraRelFacGiles; /*!< \brief coefficient for extra relaxation factor for Giles BC*/
   bool Body_Force;            /*!< \brief Flag to know if a body force is included in the formulation. */
   su2double *Body_Force_Vector;  /*!< \brief Values of the prescribed body force vector. */
+  unsigned short Body_Force_Type; /*!< \brief Determines the type of body force used. */
   su2double *FreeStreamTurboNormal; /*!< \brief Direction to initialize the flow in turbomachinery computation */
   su2double Restart_Bandwidth_Agg; /*!< \brief The aggregate of the bandwidth for writing binary restarts (to be averaged later). */
   su2double Max_Vel2; /*!< \brief The maximum velocity^2 in the domain for the incompressible preconditioner. */
@@ -5973,6 +5974,12 @@ public:
    * \return A pointer to the body force vector.
    */
   su2double* GetBody_Force_Vector(void);
+
+  /*!
+   * \brief Get information regarding type of body force
+   * \return Type of body force
+   */
+  unsigned short GetBody_Force_Type(void);
 
   /*!
    * \brief Get information about the rotational frame.
