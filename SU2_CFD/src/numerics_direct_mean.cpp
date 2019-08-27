@@ -5729,6 +5729,7 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config) {
     unsigned short iDim;
     su2double Force_Ref = config->GetForce_Ref();
+
     su2double gamma, R_gas;
     gamma = config->GetGamma();
     R_gas = config->GetGas_Constant();
@@ -5739,142 +5740,163 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     su2double BF_zone;
     BF_zone = 1;
 
-    /*--- Lookup table interpolation test ---*/
-    if (iZone == BF_zone) {
-        /*-------- Hard coding of cambered airfoil body force to residuals --------*/
-        /*--- Initialize basic variables ---*/
-        su2double pi, pitch, omega, R, omegaR;
-        pi = M_PI;
-        pitch = 1; //blade pitch
-        omega = -100; //rotational speed
-        R = 1; //radius
-        omegaR = omega * R;
-
-        /*--- Determine camber normal depending on x-coordinate ---*/
-        su2double x_coord;
-        x_coord = Coord_i[0];
-        su2double xarray[5] = {0,0.25,0.5,0.75,1};
-        su2double Nxarray[5] = {-0.5,-0.474,-0.462,-0.449,-0.423};
-        su2double Nyarray[5] = {0.866,0.88,0.887,0.893,0.906};
-        // Calculate difference between coordinate and xarray
-        int len = sizeof(xarray)/sizeof(xarray[0]), i;
-        su2double diff[len] = {0};
-        for ( i = 0; i < len; i++ ) {
-            diff[i] = xarray[i] - x_coord;
-        }
-        // Find closest number smaller than coordinate
-        su2double smallest = diff[0];
-        for ( i = 0; i < len; i++ ) {
-            if ( diff[i] < 0 && diff[i] > smallest ){
-                smallest = diff[i];
-            }
-        }
-        // Find closest number larger than coordinate
-        su2double largest = diff[len-1];
-        for ( i = 0; i < len; i++ ) {
-            if ( diff[i] > 0 && diff[i] < largest ){
-                largest = diff[i];
-            }
-        }
-        // Find index of smallest and largest closest numbers
-        int smallest_index = 0, largest_index = 0;
-        for ( i = 0; i < len; i++ ) {
-            if ( diff[i] == smallest ) {
-                smallest_index = i;
-            }
-            if ( diff[i] == largest ) {
-                largest_index = i;
-            }
-        }
-        // Find value of Nx, Ny, Tx, and Ty at given coordinate
-        su2double dx, dNx, dNy, x_to_coor, Nx, Ny, Tx, Ty;
-        dx = xarray[largest_index] - xarray[smallest_index];
-        dNx = Nxarray[largest_index] - Nxarray[smallest_index];
-        dNy = Nyarray[largest_index] - Nyarray[smallest_index];
-        x_to_coor = x_coord - xarray[smallest_index];
-        Nx = Nxarray[smallest_index] + dNx/dx * x_to_coor;
-        Ny = Nyarray[smallest_index] + dNy/dx * x_to_coor;
-        Tx = Ny;
-        Ty = -Nx;
-
-        /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
-        su2double Velocity_i_x, Velocity_i_y, vel_mag, sound, M_rel, WdotN, delta, sq_vel, BF_magnitude_inc, K = 1, Kprime, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
-        Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
-        Velocity_i_y = U_i[2] / U_i[0] - omegaR;
-        vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
-        sound = sqrt(gamma * R_gas * V_i[0]); // V_i is primitive variables as point i, T is first value
-        M_rel = vel_mag / sound;
-        WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
-        delta = asin(WdotN / vel_mag);
-        sq_vel = vel_mag * vel_mag;
-        BF_magnitude_inc = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
-
-        // Compressibility correction
-//        if (M_rel < 1) {
-//            Kprime = 1 / (sqrt(1-(M_rel * M_rel)));
-//            if (Kprime <= 3) {
-//                K = Kprime;
-//            }
-//            if (Kprime > 3) {
-//                K = 3;
-//            }
-//        }
-//        if (M_rel > 1) {
-//            Kprime = 2 / (pi * sqrt((M_rel * M_rel)-1));
-//            if (Kprime <= 3) {
-//                K = Kprime;
-//            }
-//            if (Kprime > 3) {
-//                K = 3;
-//            }
-//        }
-        BF_magnitude = K * BF_magnitude_inc;
-
-        // Decompose forces into respective
-        BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
-        BF_nx = BF_n * Nx;
-        BF_ny = BF_n * Ny;
-        BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
-        BF_tx = BF_t * Tx;
-        BF_ty = BF_t * Ty;
-        BF_x = BF_nx + BF_tx;
-        BF_y = BF_ny + BF_ty;
-
-        /*--- Add body forces to body force vector ---*/
-        Body_Force_Vector[0] = BF_x;
-        Body_Force_Vector[1] = BF_y;
-
-        /*--- Adding source terms to the governing equations ---*/
-        /*--- Zero the continuity contribution ---*/
-
-        val_residual[0] = 0.0;
-
-        /*--- Momentum contribution ---*/
-
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-        /*--- Energy contribution ---*/
-
-        val_residual[nDim + 1] = 0.0;
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
-    } else {
-        /*--- Zero the continuity contribution ---*/
-
-        val_residual[0] = 0.0;
-
-        /*--- Momentum contribution ---*/
-
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
-
-        /*--- Energy contribution ---*/
-
-        val_residual[nDim + 1] = 0.0;
-        for (iDim = 0; iDim < nDim; iDim++)
-            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+    /*--- Generalization test ---*/
+    unsigned short bf_type = config->GetBody_Force_Type();
+    if (bf_type == 1) {
+        cout << "Variable BF" << endl;
     }
+
+    /*--- Zero the continuity contribution ---*/
+
+    val_residual[0] = 0.0;
+
+    /*--- Momentum contribution ---*/
+
+    for (iDim = 0; iDim < nDim; iDim++)
+        val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+
+    /*--- Energy contribution ---*/
+
+    val_residual[nDim + 1] = 0.0;
+    for (iDim = 0; iDim < nDim; iDim++)
+        val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+
+    /*--- Lookup table interpolation test ---*/
+//    if (iZone == BF_zone) {
+//        /*-------- Hard coding of cambered airfoil body force to residuals --------*/
+//        /*--- Initialize basic variables ---*/
+//        su2double pi, pitch, omega, R, omegaR;
+//        pi = M_PI;
+//        pitch = 1; //blade pitch
+//        omega = -100; //rotational speed
+//        R = 1; //radius
+//        omegaR = omega * R;
+//
+//        /*--- Determine camber normal depending on x-coordinate ---*/
+//        su2double x_coord;
+//        x_coord = Coord_i[0];
+//        su2double xarray[5] = {0,0.25,0.5,0.75,1};
+//        su2double Nxarray[5] = {-0.5,-0.474,-0.462,-0.449,-0.423};
+//        su2double Nyarray[5] = {0.866,0.88,0.887,0.893,0.906};
+//        // Calculate difference between coordinate and xarray
+//        int len = sizeof(xarray)/sizeof(xarray[0]), i;
+//        su2double diff[len] = {0};
+//        for ( i = 0; i < len; i++ ) {
+//            diff[i] = xarray[i] - x_coord;
+//        }
+//        // Find closest number smaller than coordinate
+//        su2double smallest = diff[0];
+//        for ( i = 0; i < len; i++ ) {
+//            if ( diff[i] < 0 && diff[i] > smallest ){
+//                smallest = diff[i];
+//            }
+//        }
+//        // Find closest number larger than coordinate
+//        su2double largest = diff[len-1];
+//        for ( i = 0; i < len; i++ ) {
+//            if ( diff[i] > 0 && diff[i] < largest ){
+//                largest = diff[i];
+//            }
+//        }
+//        // Find index of smallest and largest closest numbers
+//        int smallest_index = 0, largest_index = 0;
+//        for ( i = 0; i < len; i++ ) {
+//            if ( diff[i] == smallest ) {
+//                smallest_index = i;
+//            }
+//            if ( diff[i] == largest ) {
+//                largest_index = i;
+//            }
+//        }
+//        // Find value of Nx, Ny, Tx, and Ty at given coordinate
+//        su2double dx, dNx, dNy, x_to_coor, Nx, Ny, Tx, Ty;
+//        dx = xarray[largest_index] - xarray[smallest_index];
+//        dNx = Nxarray[largest_index] - Nxarray[smallest_index];
+//        dNy = Nyarray[largest_index] - Nyarray[smallest_index];
+//        x_to_coor = x_coord - xarray[smallest_index];
+//        Nx = Nxarray[smallest_index] + dNx/dx * x_to_coor;
+//        Ny = Nyarray[smallest_index] + dNy/dx * x_to_coor;
+//        Tx = Ny;
+//        Ty = -Nx;
+//
+//        /*--- Initialize velocity variables, determine delta, calculate deflection angle, and calculate BF magnitude---*/
+//        su2double Velocity_i_x, Velocity_i_y, vel_mag, sound, M_rel, WdotN, delta, sq_vel, BF_magnitude_inc, K = 1, Kprime, BF_magnitude, BF_n, BF_t, BF_nx, BF_ny, BF_tx, BF_ty, BF_x, BF_y;
+//        Velocity_i_x = U_i[1] / U_i[0]; //Use conservative variables to determine V_x and V_y
+//        Velocity_i_y = U_i[2] / U_i[0] - omegaR;
+//        vel_mag = sqrt(Velocity_i_x * Velocity_i_x + Velocity_i_y * Velocity_i_y);
+//        sound = sqrt(gamma * R_gas * V_i[0]); // V_i is primitive variables as point i, T is first value
+//        M_rel = vel_mag / sound;
+//        WdotN = Velocity_i_x * Nx + Velocity_i_y * Ny;
+//        delta = asin(WdotN / vel_mag);
+//        sq_vel = vel_mag * vel_mag;
+//        BF_magnitude_inc = pi * delta * (1 / pitch) * sq_vel * (1 / Ny);
+//
+//        // Compressibility correction
+////        if (M_rel < 1) {
+////            Kprime = 1 / (sqrt(1-(M_rel * M_rel)));
+////            if (Kprime <= 3) {
+////                K = Kprime;
+////            }
+////            if (Kprime > 3) {
+////                K = 3;
+////            }
+////        }
+////        if (M_rel > 1) {
+////            Kprime = 2 / (pi * sqrt((M_rel * M_rel)-1));
+////            if (Kprime <= 3) {
+////                K = Kprime;
+////            }
+////            if (Kprime > 3) {
+////                K = 3;
+////            }
+////        }
+//        BF_magnitude = K * BF_magnitude_inc;
+//
+//        // Decompose forces into respective
+//        BF_n = -BF_magnitude * cos(delta); //Split normal into x and y-components
+//        BF_nx = BF_n * Nx;
+//        BF_ny = BF_n * Ny;
+//        BF_t = BF_magnitude * sin(delta); //Split tangential into x and y-components
+//        BF_tx = BF_t * Tx;
+//        BF_ty = BF_t * Ty;
+//        BF_x = BF_nx + BF_tx;
+//        BF_y = BF_ny + BF_ty;
+//
+//        /*--- Add body forces to body force vector ---*/
+//        Body_Force_Vector[0] = BF_x;
+//        Body_Force_Vector[1] = BF_y;
+//
+//        /*--- Adding source terms to the governing equations ---*/
+//        /*--- Zero the continuity contribution ---*/
+//
+//        val_residual[0] = 0.0;
+//
+//        /*--- Momentum contribution ---*/
+//
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//        /*--- Energy contribution ---*/
+//
+//        val_residual[nDim + 1] = 0.0;
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//    } else {
+//        /*--- Zero the continuity contribution ---*/
+//
+//        val_residual[0] = 0.0;
+//
+//        /*--- Momentum contribution ---*/
+//
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[iDim + 1] = -Volume * U_i[0] * Body_Force_Vector[iDim] / Force_Ref;
+//
+//        /*--- Energy contribution ---*/
+//
+//        val_residual[nDim + 1] = 0.0;
+//        for (iDim = 0; iDim < nDim; iDim++)
+//            val_residual[nDim + 1] += -Volume * U_i[iDim + 1] * Body_Force_Vector[iDim] / Force_Ref;
+//    }
 
 
     /*--- Use this to select flat plate or cambered implementation ---*/
