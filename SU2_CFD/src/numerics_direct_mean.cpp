@@ -5737,8 +5737,8 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     /*--- Get number of zones and choose which one to activate BF in ---*/
     unsigned short iZone = config->GetiZone();
     unsigned short nZone = config->GetnZone();
-    su2double BF_zone;
-    BF_zone = 1;
+    su2double BF_zone = config->GetBody_Force_Zone();
+    cout << "BF_zone: " << BF_zone << endl;
 
     /*--- Generalization test ---*/
     unsigned short bf_type = config->GetBody_Force_Type();

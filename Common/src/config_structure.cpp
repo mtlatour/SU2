@@ -752,6 +752,8 @@ void CConfig::SetConfig_Options(unsigned short val_iZone, unsigned short val_nZo
   addDoubleArrayOption("BODY_FORCE_VECTOR", 3, Body_Force_Vector, default_body_force);
   /*!\brief BODY_FORCE_TYPE \n DESCRIPTION: Choose between constant and variable body force \n Options: CONSTANT, VARIABLE \ingroup Config */
   addEnumOption("BODY_FORCE_TYPE", Body_Force_Type, Body_Force_Map, CONSTANT_BF);
+  /*!\brief BODY_FORCE_ZONE \n DESCRIPTION: Define the zone in which the body force is applied \ingroup Config */
+  addDoubleOption("BODY_FORCE_ZONE", Body_Force_Zone, 1);
   /*!\brief RESTART_SOL \n DESCRIPTION: Restart solution from native solution file \n Options: NO, YES \ingroup Config */
   addBoolOption("RESTART_SOL", Restart, false);
   /*!\brief BINARY_RESTART \n DESCRIPTION: Read / write binary SU2 native restart files. \n Options: YES, NO \ingroup Config */
