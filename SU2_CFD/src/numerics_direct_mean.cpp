@@ -5737,14 +5737,11 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     /*--- Get number of zones and choose which one to activate BF in ---*/
     unsigned short iZone = config->GetiZone();
     unsigned short nZone = config->GetnZone();
-    su2double BF_zone = config->GetBody_Force_Zone();
-    cout << "BF_zone: " << BF_zone << endl;
+    su2double BF_zone = config->GetBody_Force_Zone(), BF_pitch = config->GetBody_Force_Pitch(), BF_rotation = config->GetBody_Force_Rotation(), BF_radius = config->GetBody_Force_Radius();
 
-    /*--- Generalization test ---*/
-    unsigned short bf_type = config->GetBody_Force_Type();
-    if (bf_type == 1) {
-        cout << "Variable BF" << endl;
-    }
+    cout << "Pitch: " << BF_pitch << endl;
+    cout << "Rotation: " << BF_rotation << endl;
+    cout << "Radius: " << BF_radius << endl;
 
     /*--- Zero the continuity contribution ---*/
 

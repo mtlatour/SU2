@@ -1052,6 +1052,9 @@ private:
   su2double *Body_Force_Vector;  /*!< \brief Values of the prescribed body force vector. */
   unsigned short Body_Force_Type; /*!< \brief Determines the type of body force used. */
   su2double Body_Force_Zone; /*!< \brief Determines the zone in which the body force is implemented. */
+  su2double Body_Force_Pitch; /*!< \brief Determines the pitch used in body force calculations */
+  su2double Body_Force_Rotation; /*!< \brief Determines the pitch used in body force calculations */
+  su2double Body_Force_Radius; /*!< \brief Determines the pitch used in body force calculations */
   su2double *FreeStreamTurboNormal; /*!< \brief Direction to initialize the flow in turbomachinery computation */
   su2double Restart_Bandwidth_Agg; /*!< \brief The aggregate of the bandwidth for writing binary restarts (to be averaged later). */
   su2double Max_Vel2; /*!< \brief The maximum velocity^2 in the domain for the incompressible preconditioner. */
@@ -5987,6 +5990,24 @@ public:
    * \return Body force zone
    */
   su2double GetBody_Force_Zone(void);
+
+  /*!
+   * \brief Get pitch that will be used for body force
+   * \return Body force pitch
+   */
+  su2double GetBody_Force_Pitch(void);
+
+  /*!
+   * \brief Get rotation that will be used for body force
+   * \return Body force rotation
+   */
+  su2double GetBody_Force_Rotation(void);
+
+  /*!
+   * \brief Get radius that will be used for body force
+   * \return Body force radius
+   */
+  su2double GetBody_Force_Radius(void);
 
   /*!
    * \brief Get information about the rotational frame.

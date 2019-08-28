@@ -754,6 +754,12 @@ void CConfig::SetConfig_Options(unsigned short val_iZone, unsigned short val_nZo
   addEnumOption("BODY_FORCE_TYPE", Body_Force_Type, Body_Force_Map, CONSTANT_BF);
   /*!\brief BODY_FORCE_ZONE \n DESCRIPTION: Define the zone in which the body force is applied \ingroup Config */
   addDoubleOption("BODY_FORCE_ZONE", Body_Force_Zone, 1);
+  /*!\brief BODY_FORCE_PITCH \n DESCRIPTION: Define the pitch used in body force calculation \ingroup Config */
+  addDoubleOption("BODY_FORCE_PITCH", Body_Force_Pitch, 1);
+  /*!\brief BODY_FORCE_ROTATION \n DESCRIPTION: Define the angular velocity used in body force calculation \ingroup Config */
+  addDoubleOption("BODY_FORCE_ROTATION", Body_Force_Rotation, 0);
+  /*!\brief BODY_FORCE_RADIUS \n DESCRIPTION: Define the radius used in body force calculation \ingroup Config */
+  addDoubleOption("BODY_FORCE_RADIUS", Body_Force_Radius, 1);
   /*!\brief RESTART_SOL \n DESCRIPTION: Restart solution from native solution file \n Options: NO, YES \ingroup Config */
   addBoolOption("RESTART_SOL", Restart, false);
   /*!\brief BINARY_RESTART \n DESCRIPTION: Read / write binary SU2 native restart files. \n Options: YES, NO \ingroup Config */
