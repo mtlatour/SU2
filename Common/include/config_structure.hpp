@@ -1055,6 +1055,7 @@ private:
   su2double Body_Force_Pitch; /*!< \brief Determines the pitch used in body force calculations */
   su2double Body_Force_Rotation; /*!< \brief Determines the pitch used in body force calculations */
   su2double Body_Force_Radius; /*!< \brief Determines the pitch used in body force calculations */
+  string BF_Normals_Filename; /*!< \brief Name of input file for body force camber normals */
   su2double *FreeStreamTurboNormal; /*!< \brief Direction to initialize the flow in turbomachinery computation */
   su2double Restart_Bandwidth_Agg; /*!< \brief The aggregate of the bandwidth for writing binary restarts (to be averaged later). */
   su2double Max_Vel2; /*!< \brief The maximum velocity^2 in the domain for the incompressible preconditioner. */
@@ -6008,6 +6009,12 @@ public:
    * \return Body force radius
    */
   su2double GetBody_Force_Radius(void);
+
+  /*!
+   * \brief Get name of the input file for body force camber normals
+   * \return Name of the input file for body force camber normals.
+   */
+  string GetBF_Normals_Filename(void);
 
   /*!
    * \brief Get information about the rotational frame.

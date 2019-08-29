@@ -760,6 +760,8 @@ void CConfig::SetConfig_Options(unsigned short val_iZone, unsigned short val_nZo
   addDoubleOption("BODY_FORCE_ROTATION", Body_Force_Rotation, 0);
   /*!\brief BODY_FORCE_RADIUS \n DESCRIPTION: Define the radius used in body force calculation \ingroup Config */
   addDoubleOption("BODY_FORCE_RADIUS", Body_Force_Radius, 1);
+  /*!\brief BODY_FORCE_NORMALS \n DESCRIPTION: Input file for camber normals (w/ extension) \n DEFAULT: normals.dat \ingroup Config*/
+  addStringOption("BODY_FORCE_NORMALS", BF_Normals_Filename, string("normals.dat"));
   /*!\brief RESTART_SOL \n DESCRIPTION: Restart solution from native solution file \n Options: NO, YES \ingroup Config */
   addBoolOption("RESTART_SOL", Restart, false);
   /*!\brief BINARY_RESTART \n DESCRIPTION: Read / write binary SU2 native restart files. \n Options: YES, NO \ingroup Config */
