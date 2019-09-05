@@ -5739,9 +5739,9 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     unsigned short nZone = config->GetnZone();
     // su2double BF_zone = config->GetBody_Force_Zone(), BF_pitch = config->GetBody_Force_Pitch(), BF_rotation = config->GetBody_Force_Rotation(), BF_radius = config->GetBody_Force_Radius();
     su2double BF_zone = 1;
-    string bfnormal_filename = config->GetBF_Normals_Filename();
+    // string bfnormal_filename = config->GetBF_Normals_Filename();
 
-     /*--- Lookup table interpolation test ---*/
+    /*--- Lookup table interpolation test ---*/
 //    if (iZone == BF_zone) {
 //        /*-------- Hard coding of cambered airfoil body force to residuals --------*/
 //        /*--- Initialize basic variables ---*/
@@ -5885,16 +5885,17 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
         if (iZone == BF_zone) {
             /*-------- Hard coding of flat plate body force to residuals --------*/
             /*--- Initialize flat plate geometry and angles ---*/
-            su2double pi, pitch, alpha, plate_angle, Nx, Ny, Tx, Ty, omega, R, omegaR;
+            su2double pi, pitch, alpha, plate_angle, Nx, Ny, Tx, Ty, N, omega, R, omegaR;
             pi = M_PI;
             pitch = 1; //blade pitch
-            alpha = -15; //Angle of flat plate in degrees
+            alpha = -20; //Angle of flat plate in degrees
             plate_angle = alpha * pi / 180; //Angle of flat plate in radians
             Nx = sin(plate_angle); //x-component of normal vector of plate
             Ny = cos(plate_angle); //y-component of normal vector of plate
             Tx = cos(plate_angle);
             Ty = sin(pi + plate_angle);
-            omega = -300;
+            N = 1500;
+            omega = -1 * (N / 60) * 2 * pi;
             R = 1;
             omegaR = omega * R;
 
@@ -5980,15 +5981,15 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
             /*--- Initialize basic variables ---*/
             su2double pi, pitch, omega, R, omegaR;
             pi = M_PI;
-            pitch = 1; //blade pitch
-            omega = -300; //rotational speed
+            pitch = 20; //blade pitch
+            omega = 0; //rotational speed
             R = 1; //radius
             omegaR = omega * R;
 
             /*--- Determine camber normal depending on x-coordinate ---*/
             su2double x_coord, theta, Nx, Ny, Tx, Ty;
             x_coord = Coord_i[0];
-            theta = (-30 + x_coord * 5) * pi / 180; //linear variation of plate angle from 0 at LE to 15 at TE
+            theta = (-10 - x_coord * 10) * pi / 180; //linear variation of plate angle from LE to TE
             Nx = sin(theta);
             Ny = cos(theta);
             Tx = cos(theta);
