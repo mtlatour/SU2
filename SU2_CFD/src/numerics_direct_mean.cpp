@@ -5737,8 +5737,7 @@ void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config)
     /*--- Get number of zones and choose which one to activate BF in ---*/
     unsigned short iZone = config->GetiZone();
     unsigned short nZone = config->GetnZone();
-    // su2double BF_zone = config->GetBody_Force_Zone(), BF_pitch = config->GetBody_Force_Pitch(), BF_rotation = config->GetBody_Force_Rotation(), BF_radius = config->GetBody_Force_Radius();
-    su2double BF_zone = 1;
+    su2double BF_zone = config->GetBody_Force_Zone(), BF_blades = config->GetBody_Force_Blades(), BF_rotation = config->GetBody_Force_Rotation(), BF_radius = config->GetBody_Force_Radius();
     // string bfnormal_filename = config->GetBF_Normals_Filename();
 
     /*--- Lookup table interpolation test ---*/

@@ -1052,7 +1052,7 @@ private:
   su2double *Body_Force_Vector;  /*!< \brief Values of the prescribed body force vector. */
   unsigned short Body_Force_Type; /*!< \brief Determines the type of body force used. */
   su2double Body_Force_Zone; /*!< \brief Determines the zone in which the body force is implemented. */
-  su2double Body_Force_Pitch; /*!< \brief Determines the pitch used in body force calculations */
+  su2double Body_Force_Blades; /*!< \brief Determines the number of blades used in body force calculations */
   su2double Body_Force_Rotation; /*!< \brief Determines the pitch used in body force calculations */
   su2double Body_Force_Radius; /*!< \brief Determines the pitch used in body force calculations */
   string BF_Normals_Filename; /*!< \brief Name of input file for body force camber normals */
@@ -5993,10 +5993,10 @@ public:
   su2double GetBody_Force_Zone(void);
 
   /*!
-   * \brief Get pitch that will be used for body force
-   * \return Body force pitch
+   * \brief Get number of blades that will be used for body force
+   * \return Body force blades
    */
-  su2double GetBody_Force_Pitch(void);
+  su2double GetBody_Force_Blades(void);
 
   /*!
    * \brief Get rotation that will be used for body force

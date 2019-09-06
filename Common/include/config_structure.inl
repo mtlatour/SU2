@@ -1632,7 +1632,7 @@ inline unsigned short CConfig::GetBody_Force_Type(void) { return Body_Force_Type
 
 inline su2double CConfig::GetBody_Force_Zone(void) { return Body_Force_Zone; }
 
-inline su2double CConfig::GetBody_Force_Pitch(void) { return Body_Force_Pitch; }
+inline su2double CConfig::GetBody_Force_Blades(void) { return Body_Force_Blades; }
 
 inline su2double CConfig::GetBody_Force_Rotation(void) { return Body_Force_Rotation; }
 
