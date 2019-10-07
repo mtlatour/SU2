@@ -5462,6 +5462,39 @@ public:
 };
 
 /*!
+ * \class CSourceBodyForce_AdjFlow
+ * \brief Class for the source term integration of an adjoint body force.
+ * \ingroup SourceDiscr
+ * \author T. Economon
+ */
+class CSourceBodyForce_AdjFlow : public CNumerics {
+    su2double *Body_Force_Vector;
+
+public:
+
+    /*!
+     * \param[in] val_nDim - Number of dimensions of the problem.
+     * \param[in] val_nVar - Number of variables of the problem.
+     * \param[in] config - Definition of the particular problem.
+     */
+    CSourceBodyForce_AdjFlow(unsigned short val_nDim, unsigned short val_nVar, CConfig *config);
+
+    /*!
+     * \brief Destructor of the class.
+     */
+    ~CSourceBodyForce_AdjFlow(void);
+
+    /*!
+     * \brief Source term integration for an adjoint body force.
+     * \param[out] val_residual - Pointer to the residual vector.
+     * \param[in] config - Definition of the particular problem.
+     * \param[in] Coord_i - Coordinates of iPoint.
+     */
+    void ComputeResidual(su2double *val_residual, CConfig *config);
+
+};
+
+/*!
  * \class CSourceRotatingFrame_AdjFlow
  * \brief Source term class for rotating frame adjoint.
  * \ingroup SourceDiscr
