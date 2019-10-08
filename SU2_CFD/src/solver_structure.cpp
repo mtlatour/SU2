@@ -3050,6 +3050,20 @@ void CSolver::Read_SU2_Restart_Metadata(CGeometry *geometry, CConfig *config, bo
 
 }
 
+void CSolver::Read_BFCamberNormals_ASCII(CGeometry * geometry, CConfig *config, string val_filename) {
+    /*--- Read body force camber normal file in ASCII format ---*/
+    ifstream normals_file;
+    string text_line;
+
+    /*--- Open the normals file ---*/
+    normals_file.open(val_filename.data(), ios::in);
+
+    /*--- Read normals file and determine length ---*/
+
+    /*--- Extract data from normals file ---*/
+
+}
+
 void CSolver::Read_InletFile_ASCII(CGeometry *geometry, CConfig *config, string val_filename) {
 
   ifstream inlet_file;
