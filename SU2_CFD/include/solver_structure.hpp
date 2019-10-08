@@ -139,6 +139,7 @@ protected:
   unsigned long maxCol_InletFile;       /*!< \brief Auxiliary structure for holding the maximum number of columns in all inlet marker profiles (for data structure size) */
   unsigned long *nCol_InletFile;       /*!< \brief Auxiliary structure for holding the number of columns for a particular marker in an inlet profile file. */
   passivedouble *Inlet_Data; /*!< \brief Auxiliary structure for holding the data values from an inlet profile file. */
+  passivedouble *Camber_Normals_Data; /*!< \brief Auxiliary structure for holding the data values from a body force camber normal definition file. */
 
 public:
   

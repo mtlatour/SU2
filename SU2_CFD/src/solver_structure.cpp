@@ -3051,17 +3051,54 @@ void CSolver::Read_SU2_Restart_Metadata(CGeometry *geometry, CConfig *config, bo
 }
 
 void CSolver::Read_BFCamberNormals_ASCII(CGeometry * geometry, CConfig *config, string val_filename) {
+    nDim = geometry->GetnDim();
+
     /*--- Read body force camber normal file in ASCII format ---*/
     ifstream normals_file;
     string text_line;
+    int numRows = 0, numColumns = 0, row = 0;
 
     /*--- Open the normals file ---*/
     normals_file.open(val_filename.data(), ios::in);
 
     /*--- Read normals file and determine length ---*/
+    while (!normals_file.eof()) {
+        if (rowcount == 0) {
+            while (getline(normals_file, text_line)) {
+                stringstream linestream(text_line);
+                string data;
+                getline(linestream, data, ' ');
+                numColumns++;
+            }
+            numRows++;
+        }
+        else {
+            getline(normals_file, text_line);
+            numRows++;
+        }
+    }
+
+    /*--- Create arrays for data (x, y, z, Nx, Ny, Nz) ---*/
+    Camber_Normals_Data = new passivedouble[numRows][numColumns];
+
+    for (unsigned long iNormal = 0; iNormal < numRows * numColumns; iNormal++) {
+        Camber_Normals_Data[iNormal] = 0.0;
+    }
 
     /*--- Extract data from normals file ---*/
-
+    if (nDim == 2) {
+        while (!normals_file.eof()) {
+            normals_file >> Camber_Normals_Data[row][0] >> Camber_Normals_Data[row][1] >> Camber_Normals_Data[row][2];
+            row++;
+        }
+    }
+    else if (nDim == 3) {
+        while (!normals_file.eof()) {
+            normals_file >> Camber_Normals_Data[row][0] >> Camber_Normals_Data[row][1] >> Camber_Normals_Data[row][2] >> Camber_Normals_Data[row][3] >> Camber_Normals_Data[row][4] >> Camber_Normals_Data[row][5];
+            row++;
+        }
+    }
+    normals_file.close();
 }
 
 void CSolver::Read_InletFile_ASCII(CGeometry *geometry, CConfig *config, string val_filename) {
