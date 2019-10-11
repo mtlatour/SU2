@@ -89,6 +89,9 @@ CSolver::CSolver(void) {
   nCol_InletFile    = NULL;
   Inlet_Data        = NULL;
 
+  /*--- Camber normal data structure ---*/
+  Camber_Normals_Data = NULL;
+
   /*--- Variable initialization to avoid valgrid warnings when not used. ---*/
   IterLinSolver = 0;
 }
@@ -207,6 +210,7 @@ CSolver::~CSolver(void) {
   if (nRow_InletFile    != NULL) {delete [] nRow_InletFile;    nRow_InletFile    = NULL;}
   if (nCol_InletFile    != NULL) {delete [] nCol_InletFile;    nCol_InletFile    = NULL;}
   if (Inlet_Data        != NULL) {delete [] Inlet_Data;        Inlet_Data        = NULL;}
+  if (Camber_Normals_Data !=NULL) {delete [] Camber_Normals_Data; Camber_Normals_Data = NULL;}
 
 }
 
@@ -3050,8 +3054,9 @@ void CSolver::Read_SU2_Restart_Metadata(CGeometry *geometry, CConfig *config, bo
 
 }
 
-void CSolver::Read_BFCamberNormals_ASCII(CGeometry * geometry, CConfig *config, string val_filename) {
+void CSolver::Load_BFCamberNormals(CConfig *config) {
     nDim = geometry->GetnDim();
+    string cambers_filename = config->GetBF_Normals_Filename();
 
     /*--- Read body force camber normal file in ASCII format ---*/
     ifstream normals_file;
@@ -3059,11 +3064,11 @@ void CSolver::Read_BFCamberNormals_ASCII(CGeometry * geometry, CConfig *config, 
     int numRows = 0, numColumns = 0, row = 0;
 
     /*--- Open the normals file ---*/
-    normals_file.open(val_filename.data(), ios::in);
+    normals_file.open(cambers_filename, ios::in);
 
     /*--- Read normals file and determine length ---*/
     while (!normals_file.eof()) {
-        if (rowcount == 0) {
+        if (numRows == 0) {
             while (getline(normals_file, text_line)) {
                 stringstream linestream(text_line);
                 string data;
@@ -3079,11 +3084,7 @@ void CSolver::Read_BFCamberNormals_ASCII(CGeometry * geometry, CConfig *config, 
     }
 
     /*--- Create arrays for data (x, y, z, Nx, Ny, Nz) ---*/
-    Camber_Normals_Data = new passivedouble[numRows][numColumns];
-
-    for (unsigned long iNormal = 0; iNormal < numRows * numColumns; iNormal++) {
-        Camber_Normals_Data[iNormal] = 0.0;
-    }
+    su2double Camber_Normals_Data[numRows][numColumns] = { {0} };
 
     /*--- Extract data from normals file ---*/
     if (nDim == 2) {

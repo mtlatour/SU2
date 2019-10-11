@@ -4914,6 +4914,11 @@ void CEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_contain
 
   if (body_force) {
 
+    /*--- Load camber normal values ---*/
+    Load_BFCamberNormals(config);
+    su2double camber_normals = Get_BFCamberNormals();
+    cout << "Test Camber Normals: " << camber_normals << endl;
+
     /*--- Loop over all points ---*/
     for (iPoint = 0; iPoint < nPointDomain; iPoint++) {
 
@@ -13449,6 +13454,53 @@ void CEulerSolver::UpdateSolution_BGS(CGeometry *geometry, CConfig *config){
 
   }
 
+}
+
+void CEulerSolver::Load_BFCamberNormals(CConfig *config) {
+    nDim = geometry->GetnDim();
+    string cambers_filename = config->GetBF_Normals_Filename();
+
+    /*--- Read body force camber normal file in ASCII format ---*/
+    ifstream normals_file;
+    string text_line;
+    int numRows = 0, numColumns = 0, row = 0;
+
+    /*--- Open the normals file ---*/
+    normals_file.open(cambers_filename, ios::in);
+
+    /*--- Read normals file and determine length ---*/
+    while (!normals_file.eof()) {
+        if (numRows == 0) {
+            while (getline(normals_file, text_line)) {
+                stringstream linestream(text_line);
+                string data;
+                getline(linestream, data, ' ');
+                numColumns++;
+            }
+            numRows++;
+        } else {
+            getline(normals_file, text_line);
+            numRows++;
+        }
+    }
+
+    /*--- Create arrays for data (x, y, z, Nx, Ny, Nz) ---*/
+    su2double Camber_Normals_Data[numRows][numColumns] = {{0}};
+
+    /*--- Extract data from normals file ---*/
+    if (nDim == 2) {
+        while (!normals_file.eof()) {
+            normals_file >> Camber_Normals_Data[row][0] >> Camber_Normals_Data[row][1] >> Camber_Normals_Data[row][2];
+            row++;
+        }
+    } else if (nDim == 3) {
+        while (!normals_file.eof()) {
+            normals_file >> Camber_Normals_Data[row][0] >> Camber_Normals_Data[row][1] >> Camber_Normals_Data[row][2]
+                         >> Camber_Normals_Data[row][3] >> Camber_Normals_Data[row][4] >> Camber_Normals_Data[row][5];
+            row++;
+        }
+    }
+    normals_file.close();
 }
 
 void CEulerSolver::LoadRestart(CGeometry **geometry, CSolver ***solver, CConfig *config, int val_iter, bool val_update_geo) {

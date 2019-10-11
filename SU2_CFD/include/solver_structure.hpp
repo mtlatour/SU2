@@ -3520,7 +3520,13 @@ public:
      * \param[in] config - Definition of the particular problem.
      * \param[in] val_filename - String name of the camber normal file.
  */
-  void Read_BFCamberNormals_ASCII(CGeometry *geometry, CConfig *config, string val_filename);
+  void Load_BFCamberNormals(CGeometry *geometry, CConfig *config);
+
+  /*!
+     * \brief A virtual member
+     * \return Array with camber normal values
+  */
+  virtual su2double Get_BFCamberNormals(void);
 
   /*!
    * \brief Read a native SU2 inlet file in ASCII format.
