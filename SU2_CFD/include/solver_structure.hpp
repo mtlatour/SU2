@@ -3515,18 +3515,10 @@ public:
   void Read_SU2_Restart_Metadata(CGeometry *geometry, CConfig *config, bool adjoint_run, string val_filename);
 
   /*!
-     * \brief Read a body force camber normal file in ASCII format.
-     * \param[in] geometry - Geometrical definition of the problem.
+     * \brief Read a body force camber normal file and load the variables into an array
      * \param[in] config - Definition of the particular problem.
-     * \param[in] val_filename - String name of the camber normal file.
  */
   void Load_BFCamberNormals(CGeometry *geometry, CConfig *config);
-
-  /*!
-     * \brief A virtual member
-     * \return Array with camber normal values
-  */
-  virtual su2double Get_BFCamberNormals(void);
 
   /*!
    * \brief Read a native SU2 inlet file in ASCII format.

@@ -1672,8 +1672,6 @@ inline void CEulerSolver::SetPressure_Inf(su2double p_inf) {Pressure_Inf = p_inf
 
 inline void CEulerSolver::SetTemperature_Inf(su2double t_inf) {Temperature_Inf = t_inf;}
 
-inline CEulerSolver::Get_BFCamberNormals(void) { return Camber_Normals_Data; }
-
 inline su2double CNSSolver::GetViscosity_Inf(void) { return Viscosity_Inf; }
 
 inline su2double CNSSolver::GetTke_Inf(void) { return Tke_Inf; }

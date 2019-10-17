@@ -3054,7 +3054,7 @@ void CSolver::Read_SU2_Restart_Metadata(CGeometry *geometry, CConfig *config, bo
 
 }
 
-void CSolver::Load_BFCamberNormals(CConfig *config) {
+void CSolver::Load_BFCamberNormals(CGeometry *geometry, CConfig *config) {
     nDim = geometry->GetnDim();
     string cambers_filename = config->GetBF_Normals_Filename();
 
