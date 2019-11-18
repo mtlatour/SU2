@@ -56,6 +56,7 @@ CVariable::CVariable(void) {
   Residual_Old = NULL;
   Residual_Sum = NULL;
   Solution_Adj_Old = NULL;
+  Body_Force_Turbo = NULL;
   
 }
 
@@ -76,6 +77,7 @@ CVariable::CVariable(unsigned short val_nvar, CConfig *config) {
   Residual_Old = NULL;
   Residual_Sum = NULL;
   Solution_Adj_Old = NULL;
+  Body_Force_Turbo = NULL;
 
   /*--- Initialize the number of solution variables. This version
    of the constructor will be used primarily for converting the
@@ -110,6 +112,7 @@ CVariable::CVariable(unsigned short val_nDim, unsigned short val_nvar, CConfig *
   Residual_Old = NULL;
   Residual_Sum = NULL;
   Solution_Adj_Old = NULL;
+  Body_Force_Turbo = NULL;
   
   /*--- Initializate the number of dimension and number of variables ---*/
   nDim = val_nDim;
@@ -132,7 +135,11 @@ CVariable::CVariable(unsigned short val_nDim, unsigned short val_nvar, CConfig *
     for (iDim = 0; iDim < nDim; iDim ++)
       Gradient[iVar][iDim] = 0.0;
   }
-  
+
+  for (iDim = 0; iDim < nDim; iDim++) {
+      Body_Force_Turbo[iDim] = 0.0;
+  }
+
   if (config->GetUnsteady_Simulation() != NO) {
     Solution_time_n = new su2double [nVar];
     Solution_time_n1 = new su2double [nVar];

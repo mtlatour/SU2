@@ -68,6 +68,7 @@ protected:
   su2double *Limiter;        /*!< \brief Limiter of the solution of the problem. */
   su2double *Solution_Max;    /*!< \brief Max solution for limiter computation. */
   su2double *Solution_Min;    /*!< \brief Min solution for limiter computation. */
+  su2double *Body_Force_Turbo; /*!< \brief Variable body force vector at node. */
   su2double AuxVar;      /*!< \brief Auxiliar variable for gradient computation. */
   su2double *Grad_AuxVar;  /*!< \brief Gradient of the auxiliar variable. */
   su2double Delta_Time;  /*!< \brief Time step. */
@@ -241,6 +242,16 @@ public:
    * \param[in] val_vector - Pointer to the vector.
    */
   void SetVelSolutionOldVector(su2double *val_vector);
+
+  /*!
+   * \brief Specify body force vector at node.
+   */
+  void SetBodyForceVector(void);
+
+  /*!
+   * \brief Get body force vector at node.
+   */
+  su2double *GetBodyForceVector(void);
   
   /*!
    * \brief Set to zero the solution.

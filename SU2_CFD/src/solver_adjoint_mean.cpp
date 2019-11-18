@@ -2853,6 +2853,7 @@ void CAdjEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_cont
   //  bool gravity        = (config->GetGravityForce() == YES);
   bool harmonic_balance  = (config->GetUnsteady_Simulation() == HARMONIC_BALANCE);
   bool body_force       = config->GetBody_Force();
+  cout << "at solver_adjoint_source_residual" << endl;
   
   /*--- Initialize the source residual to zero ---*/
   for (iVar = 0; iVar < nVar; iVar++) Residual[iVar] = 0.0;
@@ -2875,6 +2876,7 @@ void CAdjEulerSolver::Source_Residual(CGeometry *geometry, CSolver **solver_cont
           /*--- Load the primitive variables ---*/
           numerics->SetPrimitive(node[iPoint]->GetPrimitive(), node[iPoint]->GetPrimitive());
 
+          cout << "at bf_solver_adjoint" << endl;
           /*--- Compute the adjoint body force source residual ---*/
           numerics->ComputeResidual(Residual, config);
 

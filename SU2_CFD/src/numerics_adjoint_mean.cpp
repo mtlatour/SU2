@@ -1522,6 +1522,7 @@ CSourceBodyForce_AdjFlow::~CSourceBodyForce_AdjFlow(void) {
 }
 
 void CSourceBodyForce_AdjFlow::ComputeResidual(su2double *val_residual, CConfig *config) {
+    cout << "at bf_computeresidual" << endl;
     /*--- Load all relevant values from config file ---*/
     unsigned short iDim, iZone = config->GetiZone();
     su2double Force_Ref = config->GetForce_Ref(), gamma = config->GetGamma(), R_gas = config->GetGas_Constant();
