@@ -1064,6 +1064,14 @@ public:
   virtual void ComputeResidual(su2double *val_residual, CConfig *config);
 
   /*!
+   * \brief Compute the numerical residual.
+   * \param[out] val_residual - Pointer to the total residual.
+   * \param[in] config - Definition of the particular problem.
+   * \param[in] val_bodyforceturbo - Pointer to turbo body force vector
+   */
+  virtual void ComputeResidual(su2double *val_residual, CConfig *config, su2double *val_bodyforceturbo);
+
+  /*!
    * \overload
    * \param[out] val_residual_i - Pointer to the total residual at point i.
    * \param[out] val_residual_j - Pointer to the total residual at point j.
@@ -5195,7 +5203,7 @@ public:
    * \param[in] config - Definition of the particular problem.
    * \param[in] Coord_i - Coordinates of iPoint.
    */
-  void ComputeResidual(su2double *val_residual, CConfig *config);
+  void ComputeResidual(su2double *val_residual, CConfig *config, su2double *val_bodyforceturbo);
 
 };
 

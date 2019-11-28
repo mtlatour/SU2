@@ -590,7 +590,10 @@ void CFluidIteration::Iterate(COutput *output,
                                  unsigned short val_iZone,
                                  unsigned short val_iInst) {
   unsigned long IntIter, ExtIter;
-  
+  unsigned short BF_zone = config_container[val_iZone]->GetBody_Force_Zone();
+
+  bool body_force = config_container[val_iZone]->GetBody_Force();
+
   bool unsteady = (config_container[val_iZone]->GetUnsteady_Simulation() == DT_STEPPING_1ST) || (config_container[val_iZone]->GetUnsteady_Simulation() == DT_STEPPING_2ND);
   bool frozen_visc = (config_container[val_iZone]->GetContinuous_Adjoint() && config_container[val_iZone]->GetFrozen_Visc_Cont()) ||
                      (config_container[val_iZone]->GetDiscrete_Adjoint() && config_container[val_iZone]->GetFrozen_Visc_Disc());
@@ -622,7 +625,7 @@ void CFluidIteration::Iterate(COutput *output,
   
   integration_container[val_iZone][val_iInst][FLOW_SOL]->MultiGrid_Iteration(geometry_container, solver_container, numerics_container,
                                                                   config_container, RUNTIME_FLOW_SYS, IntIter, val_iZone, val_iInst);
-  
+
   if ((config_container[val_iZone]->GetKind_Solver() == RANS) ||
       ((config_container[val_iZone]->GetKind_Solver() == DISC_ADJ_RANS) && !frozen_visc)) {
     
@@ -662,8 +665,12 @@ void CFluidIteration::Iterate(COutput *output,
     }
     
   }
-  
-  
+
+  /*--- Compute body force and save to each node ---*/
+  if (body_force && val_iZone == BF_zone){
+      solver_container[val_iZone][MESH_0][INST_0][FLOW_SOL]->ComputeBodyForce_Turbo(config_container[val_iZone],geometry_container[val_iZone][val_iInst][MESH_0]);
+  }
+//    , *****numerics_container
   /*--- Write the convergence history ---*/
 
   if ( unsteady && !config_container[val_iZone]->GetDiscrete_Adjoint() ) {
@@ -671,7 +678,7 @@ void CFluidIteration::Iterate(COutput *output,
     output->SetConvHistory_Body(NULL, geometry_container, solver_container, config_container, integration_container, true, 0.0, val_iZone, val_iInst);
     
   }
-  
+
 }
 
 void CFluidIteration::Update(COutput *output,
@@ -877,7 +884,7 @@ void CFluidIteration::SetWind_GustField(CConfig *config_container, CGeometry **g
       cout << endl << "WARNING - Wind Gust capability is only verified for 2 dimensional simulations." << endl;
     }
   }
-  
+
   /*--- Gust Parameters from config ---*/
   unsigned short Gust_Type = config_container->GetGust_Type();
   su2double xbegin = config_container->GetGust_Begin_Loc();    // Location at which the gust begins.

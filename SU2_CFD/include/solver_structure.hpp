@@ -4374,6 +4374,8 @@ public:
    */
   virtual void SetDES_LengthScale(CSolver** solver, CGeometry *geometry, CConfig *config);
 
+  virtual void ComputeBodyForce_Turbo(CConfig *config, CGeometry *geometry);
+
 };
 
 /*!
@@ -6932,6 +6934,8 @@ public:
    * \param[in] inMarkerTP - turboperformance marker.
    */
   void SetNuOut(su2double value, unsigned short inMarkerTP, unsigned short valSpan);
+
+  void ComputeBodyForce_Turbo(CConfig *config, CGeometry *geometry);
 
 
 };

@@ -1051,7 +1051,7 @@ private:
   bool Body_Force;            /*!< \brief Flag to know if a body force is included in the formulation. */
   su2double *Body_Force_Vector;  /*!< \brief Values of the prescribed body force vector. */
   unsigned short Body_Force_Type; /*!< \brief Determines the type of body force used. */
-  su2double Body_Force_Zone; /*!< \brief Determines the zone in which the body force is implemented. */
+  unsigned short Body_Force_Zone; /*!< \brief Determines the zone in which the body force is implemented. */
   su2double Body_Force_Blades; /*!< \brief Determines the number of blades used in body force calculations */
   su2double Body_Force_Rotation; /*!< \brief Determines the pitch used in body force calculations */
   su2double Body_Force_Radius; /*!< \brief Determines the pitch used in body force calculations */
@@ -5990,7 +5990,7 @@ public:
    * \brief Get zone in which body force will be implemented
    * \return Body force zone
    */
-  su2double GetBody_Force_Zone(void);
+  unsigned short GetBody_Force_Zone(void);
 
   /*!
    * \brief Get number of blades that will be used for body force

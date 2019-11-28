@@ -56,7 +56,7 @@ CVariable::CVariable(void) {
   Residual_Old = NULL;
   Residual_Sum = NULL;
   Solution_Adj_Old = NULL;
-  Body_Force_Turbo = NULL;
+//  Body_Force_Turbo = NULL;
   
 }
 
@@ -77,7 +77,7 @@ CVariable::CVariable(unsigned short val_nvar, CConfig *config) {
   Residual_Old = NULL;
   Residual_Sum = NULL;
   Solution_Adj_Old = NULL;
-  Body_Force_Turbo = NULL;
+//  Body_Force_Turbo = NULL;
 
   /*--- Initialize the number of solution variables. This version
    of the constructor will be used primarily for converting the
@@ -136,6 +136,7 @@ CVariable::CVariable(unsigned short val_nDim, unsigned short val_nvar, CConfig *
       Gradient[iVar][iDim] = 0.0;
   }
 
+  Body_Force_Turbo = new su2double [nDim];
   for (iDim = 0; iDim < nDim; iDim++) {
       Body_Force_Turbo[iDim] = 0.0;
   }
@@ -171,6 +172,7 @@ CVariable::~CVariable(void) {
   if (Residual_Old        != NULL) delete [] Residual_Old;
   if (Residual_Sum        != NULL) delete [] Residual_Sum;
   if (Solution_Adj_Old    != NULL) delete [] Solution_Adj_Old;
+//  if (Body_Force_Turbo    != NULL) delete [] Body_Force_Turbo;
   
   if (Gradient != NULL) {
     for (iVar = 0; iVar < nVar; iVar++)
@@ -205,6 +207,14 @@ void CVariable::SetUnd_Lapl(unsigned short val_var, su2double val_und_lapl) {
   
     Undivided_Laplacian[val_var] = val_und_lapl;
   
+}
+
+void CVariable::SetBodyForceVector_Turbo(su2double *val_bodyforceturbo) {
+
+    for (unsigned short iDim = 0; iDim < nDim; iDim++) {
+        Body_Force_Turbo[iDim] = val_bodyforceturbo[iDim];
+    }
+
 }
 
 void CVariable::SetSolution(su2double *val_solution) {
