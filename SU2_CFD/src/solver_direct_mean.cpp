@@ -14838,8 +14838,8 @@ void CEulerSolver::ComputeBodyForce_Turbo(CConfig *config, CGeometry *geometry) 
         U_i = node[iPoint]->GetSolution();
         V_i = node[iPoint]->GetPrimitive();
         Coord_i = geometry->node[iPoint]->GetCoord();
-        cout << "Coord_i[0]: " << Coord_i[0] << endl;
-        cout << "iZone for iPoint: " << config->GetiZone() << endl;
+//        cout << "Coord_i[0]: " << Coord_i[0] << endl;
+//        cout << "iZone for iPoint: " << config->GetiZone() << endl;
 
         /*--- Calculation of variable body force residuals ---*/
         /*--- Determine camber normal using x-coordinate ---*/

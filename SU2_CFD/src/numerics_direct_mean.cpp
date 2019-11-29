@@ -5728,14 +5728,16 @@ CSourceBodyForce::~CSourceBodyForce(void) {
 
 void CSourceBodyForce::ComputeResidual(su2double *val_residual, CConfig *config, su2double *val_bodyforceturbo) {
     unsigned short iDim;
-    su2double Force_Ref = config->GetForce_Ref(), BF_Vector_Turbo[nDim] = { 0.0 };
+    su2double Force_Ref = config->GetForce_Ref();
+//    BF_Vector_Turbo[nDim] = { 0.0 }
 
     /*--- Call body force vector from CEulerSolver::ComputeBodyForce ---*/
     for (iDim = 0; iDim < nDim; iDim++ ) {
-        BF_Vector_Turbo[iDim] = val_bodyforceturbo[iDim];
+        Body_Force_Vector[iDim] = val_bodyforceturbo[iDim];
+//        BF_Vector_Turbo[iDim] = val_bodyforceturbo[iDim];
     }
-    cout << "BF_Vector_Turbo[0]: " << BF_Vector_Turbo[0] << endl;
-    cout << "BF_Vector_Turbo[1]: " << BF_Vector_Turbo[1] << endl;
+//    cout << "BF_Vector_Turbo[0]: " << BF_Vector_Turbo[0] << endl;
+//    cout << "BF_Vector_Turbo[1]: " << BF_Vector_Turbo[1] << endl;
 
     /*--- Adding source terms to the governing equations ---*/
     /*--- Zero the continuity contribution ---*/
