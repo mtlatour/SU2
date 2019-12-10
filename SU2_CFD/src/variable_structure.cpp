@@ -136,9 +136,11 @@ CVariable::CVariable(unsigned short val_nDim, unsigned short val_nvar, CConfig *
       Gradient[iVar][iDim] = 0.0;
   }
 
-  Body_Force_Turbo = new su2double [nDim];
-  for (iDim = 0; iDim < nDim; iDim++) {
-      Body_Force_Turbo[iDim] = 0.0;
+  if (config->GetBody_Force()) {
+      Body_Force_Turbo = new su2double[nDim];
+      for (iDim = 0; iDim < nDim; iDim++) {
+          Body_Force_Turbo[iDim] = 0.0;
+      }
   }
 
   if (config->GetUnsteady_Simulation() != NO) {
@@ -150,9 +152,9 @@ CVariable::CVariable(unsigned short val_nDim, unsigned short val_nvar, CConfig *
     for (iVar = 0; iVar < nVar; iVar++) Solution_time_n[iVar] = 0.0;
   }
   
-	if (config->GetFSI_Simulation() && config->GetDiscrete_Adjoint()){
-	  Solution_Adj_Old = new su2double [nVar];
-	}
+  if (config->GetFSI_Simulation() && config->GetDiscrete_Adjoint()){
+    Solution_Adj_Old = new su2double [nVar];
+  }
   
 }
 
@@ -172,7 +174,7 @@ CVariable::~CVariable(void) {
   if (Residual_Old        != NULL) delete [] Residual_Old;
   if (Residual_Sum        != NULL) delete [] Residual_Sum;
   if (Solution_Adj_Old    != NULL) delete [] Solution_Adj_Old;
-//  if (Body_Force_Turbo    != NULL) delete [] Body_Force_Turbo;
+  if (Body_Force_Turbo    != NULL) delete [] Body_Force_Turbo;
   
   if (Gradient != NULL) {
     for (iVar = 0; iVar < nVar; iVar++)
