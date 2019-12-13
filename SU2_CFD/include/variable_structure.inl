@@ -1359,6 +1359,7 @@ inline void CVariable::SetAdjointSolution(su2double *adj_sol) {
 
 inline void CVariable::GetAdjointSolution(su2double *adj_sol) {
     for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+    cout<<"iVar is :: "<<iVar<<endl;
         adj_sol[iVar] = SU2_TYPE::GetDerivative(Solution[iVar]);
     }
 }
@@ -1672,6 +1673,7 @@ inline void CDiscAdjVariable::SetAdjoint_BFSource(su2double* adj_bf){
 
 inline void CDiscAdjVariable::GetAdjoint_BFSource(su2double* adj_bf){
     for (unsigned short iDim = 0; iDim < nDim; iDim++){
+    cout<<"iDim is :: "<<iDim << endl;
         adj_bf[iDim] = Adjoint_BFSource[iDim];
     }
 }

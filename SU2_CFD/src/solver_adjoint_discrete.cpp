@@ -113,8 +113,10 @@ CDiscAdjSolver::CDiscAdjSolver(CGeometry *geometry, CConfig *config, CSolver *di
   /*--- Define some auxiliary vectors related to the solution ---*/
 
   Solution   = new su2double[nVar];
+  Vector_BF   = new su2double[nDim];
 
   for (iVar = 0; iVar < nVar; iVar++) Solution[iVar]   = 1e-16;
+  for (iDim = 0; iDim < nDim; iDim++) Vector_BF[iDim]   = 1e-16;
 
   /*--- Sensitivity definition and coefficient in all the markers ---*/
 
@@ -544,10 +546,10 @@ void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *confi
   if (body_force) {
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
       /*--- Extract the adjoint solution ---*/
-      direct_solver->node[iPoint]->GetAdjoint_BFSource(Vector);
+      direct_solver->node[iPoint]->GetAdjoint_BFSource(Vector_BF);
 
       /*--- Store the adjoint solution ---*/
-      node[iPoint]->SetAdjoint_BFSource(Vector);
+      node[iPoint]->SetAdjoint_BFSource(Vector_BF);
     }
   }
 
@@ -790,9 +792,9 @@ void CDiscAdjSolver::SetAdjoint_Output(CGeometry *geometry, CConfig *config) {
 
   if (body_force) {
     for (iPoint = 0; iPoint < nPoint; iPoint++){
-      node[iPoint]->GetAdjoint_BFSource(Vector);
+      node[iPoint]->GetAdjoint_BFSource(Vector_BF);
 
-      direct_solver->node[iPoint]->SetAdjoint_BFSource(Vector);
+      direct_solver->node[iPoint]->SetAdjoint_BFSource(Vector_BF);
     }
   }
 

@@ -109,7 +109,8 @@ protected:
   *Solution_j;        /*!< \brief Auxiliary nVar vector for storing the solution at point j. */
   su2double *Vector,  /*!< \brief Auxiliary nDim vector. */
   *Vector_i,      /*!< \brief Auxiliary nDim vector to do the reconstruction of the variables at point i. */
-  *Vector_j;      /*!< \brief Auxiliary nDim vector to do the reconstruction of the variables at point j. */
+  *Vector_j,      /*!< \brief Auxiliary nDim vector to do the reconstruction of the variables at point j. */
+  *Vector_BF;
   su2double *Res_Conv,  /*!< \brief Auxiliary nVar vector for storing the convective residual. */
   *Res_Visc,        /*!< \brief Auxiliary nVar vector for storing the viscous residual. */
   *Res_Sour,        /*!< \brief Auxiliary nVar vector for storing the viscous residual. */
