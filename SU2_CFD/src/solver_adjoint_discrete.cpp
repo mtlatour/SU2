@@ -485,6 +485,7 @@ void CDiscAdjSolver::SetAdj_ObjFunc(CGeometry *geometry, CConfig *config) {
 }
 
 void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *config){
+  cout << "CDiscAdjSolver::ExtractAdjoint_Solution" << endl;
 
   bool time_n_needed  = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
       (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
@@ -546,10 +547,10 @@ void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *confi
   if (body_force) {
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
       /*--- Extract the adjoint solution ---*/
-      direct_solver->node[iPoint]->GetAdjoint_BFSource(Vector_BF);
+      direct_solver->node[iPoint]->GetAdjoint_BFSource(Solution);
 
       /*--- Store the adjoint solution ---*/
-      node[iPoint]->SetAdjoint_BFSource(Vector_BF);
+      node[iPoint]->SetAdjoint_BFSource(Solution);
     }
   }
 
@@ -765,6 +766,7 @@ void CDiscAdjSolver::ExtractAdjoint_CrossTerm_Geometry_Flow(CGeometry *geometry,
 
 
 void CDiscAdjSolver::SetAdjoint_Output(CGeometry *geometry, CConfig *config) {
+  cout << "CDiscAdjSolver::SetAdjoint_Output" << endl;
 
   bool dual_time = (config->GetUnsteady_Simulation() == DT_STEPPING_1ST ||
       config->GetUnsteady_Simulation() == DT_STEPPING_2ND);
@@ -792,9 +794,9 @@ void CDiscAdjSolver::SetAdjoint_Output(CGeometry *geometry, CConfig *config) {
 
   if (body_force) {
     for (iPoint = 0; iPoint < nPoint; iPoint++){
-      node[iPoint]->GetAdjoint_BFSource(Vector_BF);
+      node[iPoint]->GetAdjoint_BFSource(Solution);
 
-      direct_solver->node[iPoint]->SetAdjoint_BFSource(Vector_BF);
+      direct_solver->node[iPoint]->SetAdjoint_BFSource(Solution);
     }
   }
 

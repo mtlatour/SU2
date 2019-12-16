@@ -716,17 +716,23 @@ inline void CEulerVariable::SetSolution_New(void) {
 }
 
 inline void CEulerVariable::SetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-        SU2_TYPE::SetDerivative(Body_Force_Turbo[iDim], SU2_TYPE::GetValue(adj_bf[iDim]));
-    }
+  cout << "CEulerVariable::SetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    SU2_TYPE::SetDerivative(Body_Force_Turbo[iDim], SU2_TYPE::GetValue(adj_bf[iDim]));
+//  }
+  for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
+    SU2_TYPE::SetDerivative(Body_Force_Turbo[iVar-1], SU2_TYPE::GetValue(adj_bf[iVar]));
+  }
 }
 
 inline void CEulerVariable::GetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-        adj_bf[iDim] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iDim]);
-//    cout << "AAAAAAAAA:" << adj_hb [iVar] << endl;
-//    cout << "BBBBBBBBB:" << HB_Source [iVar] << endl;
-    }
+  cout << "CEulerVariable::GetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    adj_bf[iDim] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iDim]);
+//  }
+  for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
+    adj_bf[iVar] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iVar-1]);
+  }
 }
 
 inline void CEulerVariable::SetBodyForce_Source(unsigned short val_var, su2double val_source) { Body_Force_Turbo[val_var] = val_source; }
@@ -1359,21 +1365,28 @@ inline void CVariable::SetAdjointSolution(su2double *adj_sol) {
 
 inline void CVariable::GetAdjointSolution(su2double *adj_sol) {
     for (unsigned short iVar = 0; iVar < nVar; iVar++) {
-    cout<<"iVar is :: "<<iVar<<endl;
         adj_sol[iVar] = SU2_TYPE::GetDerivative(Solution[iVar]);
     }
 }
 
 inline void CVariable::SetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-        SU2_TYPE::SetDerivative(Body_Force_Turbo[iDim], SU2_TYPE::GetValue(adj_bf[iDim]));
-    }
+  cout << "CVariable::SetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    SU2_TYPE::SetDerivative(Body_Force_Turbo[iDim], SU2_TYPE::GetValue(adj_bf[iDim]));
+//  }
+  for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
+    SU2_TYPE::SetDerivative(Body_Force_Turbo[iVar-1], SU2_TYPE::GetValue(adj_bf[iVar]));
+  }
 }
 
 inline void CVariable::GetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-        adj_bf[iDim] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iDim]);
-    }
+  cout << "CVariable::GetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    adj_bf[iDim] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iDim]);
+//  }
+  for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
+    adj_bf[iVar] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iVar-1]);
+  }
 }
 
 inline void CVariable::SetAdjointSolution_time_n(su2double *adj_sol) {
@@ -1666,16 +1679,23 @@ inline su2double CDiscAdjVariable::Get_BGSSolution_Geometry(unsigned short iDim)
 inline su2double* CDiscAdjVariable::GetBFSource_Direct() { return BFSource_Direct; }
 
 inline void CDiscAdjVariable::SetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-        Adjoint_BFSource[iDim] = adj_bf[iDim];
-    }
+  cout << "CDiscAdjVariable::SetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    Adjoint_BFSource[iDim] = adj_bf[iDim];
+//  }
+  for (unsigned short iVar = 0; iVar < nVar; iVar++){
+    Adjoint_BFSource[iVar] = adj_bf[iVar];
+  }
 }
 
 inline void CDiscAdjVariable::GetAdjoint_BFSource(su2double* adj_bf){
-    for (unsigned short iDim = 0; iDim < nDim; iDim++){
-    cout<<"iDim is :: "<<iDim << endl;
-        adj_bf[iDim] = Adjoint_BFSource[iDim];
-    }
+  cout << "CDiscAdjVariable::GetAdjoint_BFSource" << endl;
+//  for (unsigned short iDim = 0; iDim < nDim; iDim++){
+//    adj_bf[iDim+1] = Adjoint_BFSource[iDim];
+//  }
+  for (unsigned short iVar = 0; iVar < nVar; iVar++) {
+    adj_bf[iVar] = Adjoint_BFSource[iVar];
+  }
 }
 
 inline void CDiscAdjFEAVariable::Set_BGSSolution(unsigned short iDim, su2double val_solution) { 
