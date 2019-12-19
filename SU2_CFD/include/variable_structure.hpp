@@ -251,7 +251,7 @@ public:
   /*!
    * \brief Get body force vector at node.
    */
-  su2double *GetBodyForceVector_Turbo(void);
+  virtual su2double *GetBodyForceVector_Turbo(void);
   
   /*!
    * \brief Set to zero the solution.

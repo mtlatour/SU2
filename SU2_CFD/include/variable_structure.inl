@@ -723,6 +723,8 @@ inline void CEulerVariable::SetAdjoint_BFSource(su2double* adj_bf){
   for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
     SU2_TYPE::SetDerivative(Body_Force_Turbo[iVar-1], SU2_TYPE::GetValue(adj_bf[iVar]));
   }
+  SU2_TYPE::SetDerivative(Body_Force_Turbo[0], 0.0);
+  SU2_TYPE::SetDerivative(Body_Force_Turbo[nVar-1], 0.0);
 }
 
 inline void CEulerVariable::GetAdjoint_BFSource(su2double* adj_bf){
@@ -733,6 +735,8 @@ inline void CEulerVariable::GetAdjoint_BFSource(su2double* adj_bf){
   for (unsigned short iVar = 1; iVar < nVar-1; iVar++) {
     adj_bf[iVar] = SU2_TYPE::GetDerivative(Body_Force_Turbo[iVar-1]);
   }
+  adj_bf[0] = SU2_TYPE::GetDerivative(0.0);
+  adj_bf[nVar-1] = SU2_TYPE::GetDerivative(0.0);
 }
 
 inline void CEulerVariable::SetBodyForce_Source(unsigned short val_var, su2double val_source) { Body_Force_Turbo[val_var] = val_source; }

@@ -14945,6 +14945,7 @@ void CEulerSolver::ComputeBodyForce_Turbo(CConfig *config, CGeometry *geometry) 
         BodyForceVector_Turbo[1] = BF_y;
 
         /*--- Test set and get body force to node ---*/
+        cout<<"BodyForce X :: "<<BodyForceVector_Turbo[0]<<"BodyForce Y :: "<<BodyForceVector_Turbo[1]<<endl;
         node[iPoint]->SetBodyForceVector_Turbo(BodyForceVector_Turbo);
     }
 

@@ -106,7 +106,8 @@ protected:
   su2double **Point_Max_Coord_BGS; /*!< \brief Vector with pointers to the coords of the maximal residual for each variable. */
   su2double *Solution,    /*!< \brief Auxiliary nVar vector. */
   *Solution_i,        /*!< \brief Auxiliary nVar vector for storing the solution at point i. */
-  *Solution_j;        /*!< \brief Auxiliary nVar vector for storing the solution at point j. */
+  *Solution_j,        /*!< \brief Auxiliary nVar vector for storing the solution at point j. */
+  *Solution_bf;        /*!< \brief Auxiliary nVar vector for storing the solution at point j. */
   su2double *Vector,  /*!< \brief Auxiliary nDim vector. */
   *Vector_i,      /*!< \brief Auxiliary nDim vector to do the reconstruction of the variables at point i. */
   *Vector_j,      /*!< \brief Auxiliary nDim vector to do the reconstruction of the variables at point j. */

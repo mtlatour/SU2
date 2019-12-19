@@ -100,12 +100,12 @@ CDiscAdjVariable::CDiscAdjVariable(su2double* val_solution, unsigned short val_n
 
   if (body_force) {
     BFSource_Direct = new su2double[nDim];
-    Adjoint_BFSource = new su2double[nDim];
+    Adjoint_BFSource = new su2double[nVar];
     for (iDim = 0; iDim < nDim; iDim++) {
       BFSource_Direct[iDim] = 0.0;
     }
     for (iVar = 0; iVar < nVar; iVar++){
-      Adjoint_BFSource[iDim] = 0.0;
+      Adjoint_BFSource[iVar] = 0.0;
     }
   }
 
