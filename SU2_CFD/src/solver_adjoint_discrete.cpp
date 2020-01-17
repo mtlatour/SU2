@@ -60,6 +60,7 @@ CDiscAdjSolver::CDiscAdjSolver(CGeometry *geometry, CConfig *config, CSolver *di
 
   CSensitivity = NULL;
   Solution_bf = NULL;
+  Vector_BF = NULL;
 
   /*-- Store some information about direct solver ---*/
   this->KindDirect_Solver = Kind_Solver;
@@ -156,7 +157,6 @@ CDiscAdjSolver::~CDiscAdjSolver(void) {
 }
 
 void CDiscAdjSolver::SetRecording(CGeometry* geometry, CConfig *config){
-  cout << "CDiscAdjSolver::SetRecording" << endl;
   bool time_n_needed  = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
       (config->GetUnsteady_Simulation() == DT_STEPPING_2ND)),
   time_n1_needed = config->GetUnsteady_Simulation() == DT_STEPPING_2ND;
@@ -171,14 +171,6 @@ void CDiscAdjSolver::SetRecording(CGeometry* geometry, CConfig *config){
     direct_solver->node[iPoint]->SetSolution(node[iPoint]->GetSolution_Direct());
   }
 
-  if (body_force){
-	  for (iPoint = 0; iPoint < nPoint; iPoint++) {
-		  for ( unsigned short iDim = 0; iDim < nDim; iDim++) {
-		    direct_solver->node[iPoint]->SetBodyForce_Source(iDim, node[iPoint]->GetBFSource_Direct()[iDim]);
-		  }
-	  }
-  }
-
   if (time_n_needed) {
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
       for (iVar = 0; iVar < nVar; iVar++) {
@@ -190,6 +182,14 @@ void CDiscAdjSolver::SetRecording(CGeometry* geometry, CConfig *config){
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
       for (iVar = 0; iVar < nVar; iVar++) {
         AD::ResetInput(direct_solver->node[iPoint]->GetSolution_time_n1()[iVar]);
+      }
+    }
+  }
+
+  if (body_force){
+    for (iPoint = 0; iPoint < nPoint; iPoint++) {
+      for ( unsigned short iDim = 0; iDim < nDim; iDim++) {
+        direct_solver->node[iPoint]->SetBodyForce_Source(iDim, node[iPoint]->GetBFSource_Direct()[iDim]);
       }
     }
   }
@@ -282,13 +282,9 @@ void CDiscAdjSolver::RegisterSolution(CGeometry *geometry, CConfig *config) {
     }
   }
 
-  cout << "CDiscAdjSolver::RegisterSolution" << endl;
   if (body_force) {
-    cout << "In body_force loop. Zone: " << config->GetiZone() << endl;
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
       direct_solver->node[iPoint]->RegisterBFSource(input);
-//      Vector_BF = direct_solver->node[iPoint]->GetBodyForceVector_Turbo();
-//      cout<<"Vector_BF [1] :: "<<Vector_BF[0]<<" Vector_BF[2] :: "<<Vector_BF[1]<<endl;
     }
   }
 }
@@ -489,7 +485,6 @@ void CDiscAdjSolver::SetAdj_ObjFunc(CGeometry *geometry, CConfig *config) {
 }
 
 void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *config){
-  cout << "CDiscAdjSolver::ExtractAdjoint_Solution" << endl;
 
   bool time_n_needed  = ((config->GetUnsteady_Simulation() == DT_STEPPING_1ST) ||
       (config->GetUnsteady_Simulation() == DT_STEPPING_2ND));
@@ -508,21 +503,16 @@ void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *confi
       SetRes_Max(iVar,0.0,0);
   }
 
-  cout << "TEST for segfault 1" << endl;
   for (iPoint = 0; iPoint < nPoint; iPoint++) {
-    cout << "nPoint:: " << nPoint << " iPoint:: " << iPoint << endl;
     /*--- Set the old solution ---*/
 
     node[iPoint]->Set_OldSolution();
-    cout << "TEST for segfault 2" << endl;
     /*--- Extract the adjoint solution ---*/
 
     direct_solver->node[iPoint]->GetAdjointSolution(Solution);
-    cout << "TEST for segfault 3" << endl;
     /*--- Store the adjoint solution ---*/
 
     node[iPoint]->SetSolution(Solution);
-    cout << "TEST for segfault 4" << endl;
   }
 
   if (time_n_needed) {
@@ -552,14 +542,12 @@ void CDiscAdjSolver::ExtractAdjoint_Solution(CGeometry *geometry, CConfig *confi
 
   if (body_force) {
     for (iPoint = 0; iPoint < nPoint; iPoint++) {
+
       /*--- Extract the adjoint solution ---*/
-    	cout<<"nPoint :: "<<nPoint<<" iPoint :: "<<iPoint << "iZone :: " << config->GetiZone() <<endl;
-    	Vector_BF = direct_solver->node[iPoint]->GetBodyForceVector_Turbo();
-    	cout<<"Vector_BF [1] :: "<<Vector_BF[0]<<" Vector_BF[2] :: "<<Vector_BF[1]<<endl;
-      direct_solver->node[iPoint]->GetAdjoint_BFSource(Solution_bf);
-      cout<<"Solution_bf [1] :: "<<Solution_bf[1]<<" Solution_bf[2] :: "<<Solution_bf[2]<<endl;
+      direct_solver->node[iPoint]->GetAdjoint_BFSource(Vector_BF);
+
       /*--- Store the adjoint solution ---*/
-      node[iPoint]->SetAdjoint_BFSource(Solution_bf);
+      node[iPoint]->SetAdjoint_BFSource(Vector_BF);
     }
   }
 
@@ -644,7 +632,6 @@ void CDiscAdjSolver::ExtractAdjoint_Variables(CGeometry *geometry, CConfig *conf
   /*--- Extract here the adjoint values of everything else that is registered as input in RegisterInput. ---*/
 
 }
-
 
 void CDiscAdjSolver::ExtractAdjoint_Geometry(CGeometry *geometry, CConfig *config) {
 
@@ -774,7 +761,6 @@ void CDiscAdjSolver::ExtractAdjoint_CrossTerm_Geometry_Flow(CGeometry *geometry,
 }
 
 void CDiscAdjSolver::SetAdjoint_Output(CGeometry *geometry, CConfig *config) {
-  cout << "CDiscAdjSolver::SetAdjoint_Output" << endl;
 
   bool dual_time = (config->GetUnsteady_Simulation() == DT_STEPPING_1ST ||
       config->GetUnsteady_Simulation() == DT_STEPPING_2ND);
@@ -798,16 +784,10 @@ void CDiscAdjSolver::SetAdjoint_Output(CGeometry *geometry, CConfig *config) {
       }
     }
     direct_solver->node[iPoint]->SetAdjointSolution(Solution);
-  }
+    if (body_force) {
+      node[iPoint]->GetAdjoint_BFSource(Vector_BF);
 
-  if (body_force) {
-    for (iPoint = 0; iPoint < nPoint; iPoint++){
-      cout << "nPoint:: " << nPoint << " iPoint:: " << iPoint << endl;
-      node[iPoint]->GetAdjoint_BFSource(Solution_bf);
-      cout << "Solution_bf:: " << Solution_bf[0] << ", " << Solution_bf[1] << endl;
-
-      direct_solver->node[iPoint]->SetAdjoint_BFSource(Solution_bf);
-      cout << "Solution_bf:: " << Solution_bf[0] << ", " << Solution_bf[1] << endl;
+      direct_solver->node[iPoint]->SetAdjoint_BFSource(Vector_BF);
     }
   }
 

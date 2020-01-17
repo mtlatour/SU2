@@ -3237,13 +3237,13 @@ public:
    * \brief Set the value of the hb source.
    * \param[in] adj_bf - Pointer to the residual vector.
    */
-  virtual void SetAdjoint_BFSource(su2double *adj_bf);
+  void SetAdjoint_BFSource(su2double *adj_bf);
 
   /*!
    * \brief Get the value of the hb source.
    * \param[in] adj_bf - Pointer to the residual vector.
    */
-  virtual void GetAdjoint_BFSource(su2double* adj_bf);
+  void GetAdjoint_BFSource(su2double* adj_bf);
 
   /*!
    * \brief Add a value to the new solution container for Classical RK4.
@@ -4940,13 +4940,13 @@ public:
    * \brief Set the value of the hb source.
    * \param[in] adj_bf - Pointer to the residual vector.
    */
-  virtual void SetAdjoint_BFSource(su2double *adj_bf);
+  void SetAdjoint_BFSource(su2double *adj_bf);
 
   /*!
    * \brief Get the value of the hb source.
    * \param[in] adj_bf - Pointer to the residual vector.
    */
-  virtual void GetAdjoint_BFSource(su2double* adj_bf);
+  void GetAdjoint_BFSource(su2double* adj_bf);
 
 };
 

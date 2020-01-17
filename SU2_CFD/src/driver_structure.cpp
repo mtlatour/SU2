@@ -4455,7 +4455,6 @@ CDiscAdjFluidDriver::~CDiscAdjFluidDriver(){
 
 void CDiscAdjFluidDriver::Run() {
 
-  cout << "CDiscAdjFluidDriver::Run()" << endl;
   unsigned short iZone = 0, checkConvergence;
   unsigned long IntIter, nIntIter;
 
@@ -4502,7 +4501,6 @@ void CDiscAdjFluidDriver::Run() {
    *    of the previous iteration. The values are passed to the AD tool. ---*/
 
     for (iZone = 0; iZone < nZone; iZone++) {
-      cout << "iZone_driver:: " << iZone << endl;
 
       config_container[iZone]->SetIntIter(IntIter);
 
@@ -4513,12 +4511,10 @@ void CDiscAdjFluidDriver::Run() {
     /*--- Initialize the adjoint of the objective function with 1.0. ---*/
 
     SetAdj_ObjFunction();
-    cout << "SetAdj_ObjFunction()" << endl;
 
     /*--- Interpret the stored information by calling the corresponding routine of the AD tool. ---*/
 
     AD::ComputeAdjoint();
-    cout << "AD::ComputeAdjoint()" << endl;
 
     /*--- Extract the computed adjoint values of the input variables and store them for the next iteration. ---*/
 
@@ -4594,7 +4590,6 @@ void CDiscAdjFluidDriver::Run() {
 }
 
 void CDiscAdjFluidDriver::SetRecording(unsigned short kind_recording){
-  cout << "CDiscAdjFluidDriver::SetRecording()" << endl;
   unsigned short iZone, iMesh;
 
   AD::Reset();

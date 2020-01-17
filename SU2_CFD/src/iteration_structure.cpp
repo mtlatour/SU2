@@ -670,7 +670,7 @@ void CFluidIteration::Iterate(COutput *output,
   if (body_force && val_iZone == BF_zone){
       solver_container[val_iZone][MESH_0][INST_0][FLOW_SOL]->ComputeBodyForce_Turbo(config_container[val_iZone],geometry_container[val_iZone][val_iInst][MESH_0]);
   }
-//    , *****numerics_container
+
   /*--- Write the convergence history ---*/
 
   if ( unsteady && !config_container[val_iZone]->GetDiscrete_Adjoint() ) {
@@ -2340,7 +2340,6 @@ void CDiscAdjFluidIteration::Iterate(COutput *output,
                                         CFreeFormDefBox*** FFDBox,
                                         unsigned short val_iZone,
                                         unsigned short val_iInst) {
-  cout << "CDiscAdjFluidIteration::Iterate" << endl;
   unsigned long ExtIter = config_container[val_iZone]->GetExtIter();
   unsigned short Kind_Solver = config_container[val_iZone]->GetKind_Solver();
   unsigned long IntIter = 0;
@@ -2383,7 +2382,6 @@ void CDiscAdjFluidIteration::Iterate(COutput *output,
     
 void CDiscAdjFluidIteration::InitializeAdjoint(CSolver *****solver_container, CGeometry ****geometry_container, CConfig **config_container, unsigned short iZone, unsigned short iInst){
 
-  cout << "CDiscAdjFluidIteration::InitializeAdjoint" << endl;
   unsigned short Kind_Solver = config_container[iZone]->GetKind_Solver();
   bool frozen_visc = config_container[iZone]->GetFrozen_Visc_Disc();
   bool heat = config_container[iZone]->GetWeakly_Coupled_Heat();
@@ -2414,7 +2412,6 @@ void CDiscAdjFluidIteration::InitializeAdjoint(CSolver *****solver_container, CG
 
 void CDiscAdjFluidIteration::RegisterInput(CSolver *****solver_container, CGeometry ****geometry_container, CConfig **config_container, unsigned short iZone, unsigned short iInst, unsigned short kind_recording){
 
-  cout << "CDiscAdjFluidIteration::RegisterInput()" << endl;
   unsigned short Kind_Solver = config_container[iZone]->GetKind_Solver();
   bool frozen_visc = config_container[iZone]->GetFrozen_Visc_Disc();
   bool heat = config_container[iZone]->GetWeakly_Coupled_Heat();
