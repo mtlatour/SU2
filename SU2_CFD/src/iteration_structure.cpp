@@ -668,7 +668,8 @@ void CFluidIteration::Iterate(COutput *output,
 
   /*--- Compute body force and save to each node ---*/
   if (body_force && val_iZone == BF_zone){
-      solver_container[val_iZone][MESH_0][INST_0][FLOW_SOL]->ComputeBodyForce_Turbo(config_container[val_iZone],geometry_container[val_iZone][val_iInst][MESH_0]);
+	  cout<<"Body force function being called for zone :"<<val_iZone<<endl;
+	  solver_container[val_iZone][MESH_0][INST_0][FLOW_SOL]->ComputeBodyForce_Turbo(config_container[val_iZone],geometry_container[val_iZone][val_iInst][MESH_0]);
   }
 
   /*--- Write the convergence history ---*/

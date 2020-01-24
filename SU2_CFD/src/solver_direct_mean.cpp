@@ -4359,7 +4359,7 @@ unsigned long CEulerSolver::SetPrimitive_Variables(CSolver **solver_container, C
     /*--- Initialize the convective, source and viscous residual vector ---*/
     
     if (!Output) LinSysRes.SetBlock_Zero(iPoint);
-    
+
   }
   
   return ErrorCounter;
@@ -5397,7 +5397,7 @@ void CEulerSolver::Pressure_Forces(CGeometry *geometry, CConfig *config) {
    For dynamic meshes, use the motion Mach number as a reference value
    for computing the force coefficients. Otherwise, use the freestream
    values, which is the standard convention. ---*/
-  
+
   RefTemp     = Temperature_Inf;
   RefDensity  = Density_Inf;
   RefPressure = Pressure_Inf;
@@ -5461,14 +5461,17 @@ void CEulerSolver::Pressure_Forces(CGeometry *geometry, CConfig *config) {
       }
     }
     
-    if ((Boundary == EULER_WALL) || (Boundary == HEAT_FLUX) ||
-        (Boundary == ISOTHERMAL) || (Boundary == NEARFIELD_BOUNDARY) ||
-        (Boundary == CHT_WALL_INTERFACE) ||
-        (Boundary == INLET_FLOW) || (Boundary == OUTLET_FLOW) ||
-        (Boundary == ACTDISK_INLET) || (Boundary == ACTDISK_OUTLET)||
-        (Boundary == ENGINE_INFLOW) || (Boundary == ENGINE_EXHAUST)) {
+//    if ((Boundary == EULER_WALL) || (Boundary == HEAT_FLUX) ||
+//        (Boundary == ISOTHERMAL) || (Boundary == NEARFIELD_BOUNDARY) ||
+//        (Boundary == CHT_WALL_INTERFACE) ||
+//        (Boundary == INLET_FLOW) || (Boundary == OUTLET_FLOW) ||
+//        (Boundary == ACTDISK_INLET) || (Boundary == ACTDISK_OUTLET)||
+//        (Boundary == ENGINE_INFLOW) || (Boundary == ENGINE_EXHAUST) || (Boundary == OUTFLOW))
+    if (1)
+    {
       
       /*--- Forces initialization at each Marker ---*/
+
       
       CD_Inv[iMarker] = 0.0;        CL_Inv[iMarker] = 0.0; CSF_Inv[iMarker] = 0.0;
       CMx_Inv[iMarker] = 0.0;          CMy_Inv[iMarker] = 0.0;   CMz_Inv[iMarker] = 0.0;
@@ -5491,8 +5494,8 @@ void CEulerSolver::Pressure_Forces(CGeometry *geometry, CConfig *config) {
         
         iPoint = geometry->vertex[iMarker][iVertex]->GetNode();
         
-        Pressure = node[iPoint]->GetPressure();
-        
+        Pressure = Pressure + node[iPoint]->GetVelocity(1);
+        cout<<"Calculating PRessure :: "<<Pressure<<"\n";
         CPressure[iMarker][iVertex] = (Pressure - RefPressure)*factor*RefArea;
         
         /*--- Note that the pressure coefficient is computed at the
@@ -5502,6 +5505,7 @@ void CEulerSolver::Pressure_Forces(CGeometry *geometry, CConfig *config) {
           
           Normal = geometry->vertex[iMarker][iVertex]->GetNormal();
           Coord = geometry->node[iPoint]->GetCoord();
+          cout<<"Mesh Coordinates :: "<<Coord[0]<<"\n";
           
           /*--- Quadratic objective function for the near-field.
            This uses the infinity pressure regardless of Mach number. ---*/
@@ -5549,7 +5553,7 @@ void CEulerSolver::Pressure_Forces(CGeometry *geometry, CConfig *config) {
         
         if (Boundary != NEARFIELD_BOUNDARY) {
           if (nDim == 2) {
-            CD_Inv[iMarker]     =  ForceInviscid[0]*cos(Alpha) + ForceInviscid[1]*sin(Alpha);
+            CD_Inv[iMarker]     =  Pressure;//ForceInviscid[0]*cos(Alpha) + ForceInviscid[1]*sin(Alpha);
             CL_Inv[iMarker]     = -ForceInviscid[0]*sin(Alpha) + ForceInviscid[1]*cos(Alpha);
             CEff_Inv[iMarker]   = CL_Inv[iMarker] / (CD_Inv[iMarker]+EPS);
             CMz_Inv[iMarker]    = MomentInviscid[2];
