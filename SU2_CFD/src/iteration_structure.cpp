@@ -2443,6 +2443,11 @@ void CDiscAdjFluidIteration::RegisterInput(CSolver *****solver_container, CGeome
     
   }
 
+  if (kind_recording == CAMB_NORM) {
+    /*--- Register camber normals as input ---*/
+
+  }
+
   if (kind_recording == FLOW_CROSS_TERM){
 
     /*--- Register flow and turbulent variables as input ---*/
