@@ -836,6 +836,13 @@ void CDiscAdjSolver::SetSensitivity(CGeometry *geometry, CConfig *config) {
 
   bool time_stepping = (config->GetUnsteady_Simulation() != STEADY);
 
+  /*--- Camber normal total gradient test ---*/
+  cout << "IN SETSENSITIVITY" << endl;
+  config->TotalGrad_Camb_Norm();
+
+
+  /*------*/
+
   for (iPoint = 0; iPoint < nPoint; iPoint++) {
     Coord = geometry->node[iPoint]->GetCoord();
 

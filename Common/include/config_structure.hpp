@@ -1043,6 +1043,8 @@ private:
   su2double FinalOutletPressure; /*!< \brief Final outlet pressure if Ramp outlet pressure is activated. */
   su2double MonitorOutletPressure; /*!< \brief Monitor outlet pressure if Ramp outlet pressure is activated. */
   su2double *default_body_force;        /*!< \brief Default body force vector for the COption class. */
+  su2double *default_camb_norm; /*!< \brief Default camber normal vector is a horizontal plate. */
+  su2double *totalgrad_camb_norm; /*!< \brief Total gradient of camber normal vector. */
   su2double *default_nacelle_location;        /*!< \brief Location of the nacelle. */
   su2double *default_cp_polycoeffs;        /*!< \brief Array for specific heat polynomial coefficients. */
   su2double *default_mu_polycoeffs;        /*!< \brief Array for viscosity polynomial coefficients. */
@@ -1050,6 +1052,7 @@ private:
   su2double *ExtraRelFacGiles; /*!< \brief coefficient for extra relaxation factor for Giles BC*/
   bool Body_Force;            /*!< \brief Flag to know if a body force is included in the formulation. */
   su2double *Body_Force_Vector;  /*!< \brief Values of the prescribed body force vector. */
+  su2double *Body_Force_Camb_Norm; /*!< \brief Array of camber normal values HARDCODED. */
   unsigned short Body_Force_Type; /*!< \brief Determines the type of body force used. */
   unsigned short Body_Force_Zone; /*!< \brief Determines the zone in which the body force is implemented. */
   su2double Body_Force_Blades; /*!< \brief Determines the number of blades used in body force calculations */
@@ -5979,6 +5982,22 @@ public:
    * \return A pointer to the body force vector.
    */
   su2double* GetBody_Force_Vector(void);
+
+  /*!
+   * \brief Get a pointer to the body force camber normal vector
+   * \return A pointer to the body force camber normal vector.
+   */
+  su2double* GetBody_Force_Camb_Norm(void);
+
+  /*!
+   * \brief Register camber normals as input for AD.
+   */
+  void Register_Camb_Norm(void);
+
+  /*!
+   * \brief Output total gradient of camber normal to console.
+   */
+  void TotalGrad_Camb_Norm(void);
 
   /*!
    * \brief Get information regarding type of body force

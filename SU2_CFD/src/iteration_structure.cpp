@@ -2445,7 +2445,8 @@ void CDiscAdjFluidIteration::RegisterInput(CSolver *****solver_container, CGeome
 
   if (kind_recording == CAMB_NORM) {
     /*--- Register camber normals as input ---*/
-
+    cout << "CAMB_NORM :: " << config_container[iZone]->GetBody_Force_Camb_Norm()[0] << ", " << config_container[iZone]->GetBody_Force_Camb_Norm()[1] << ", " << config_container[iZone]->GetBody_Force_Camb_Norm()[2] << ", " << config_container[iZone]->GetBody_Force_Camb_Norm()[3] << endl;
+    config_container[iZone]->Register_Camb_Norm();
   }
 
   if (kind_recording == FLOW_CROSS_TERM){
